@@ -74,6 +74,45 @@ int	MemoClosure (lua_State* L, const char* key, lua_CFunction lfunc, int closure
 
 // Struct Resolution
 
+#ifdef UNICODE
+#error Unicode support must be handled at run-time
+#endif
+
+#pragma pack(push, 2) // grr!
+
+// 2.5+ unlimited values and strings
+typedef struct tagRV25P {
+	CValue* rvpValues;
+	int		rvNumberOfValues;
+	int		rvFree1[VALUES_NUMBEROF_ALTERABLE - 2];		// for compatiblity with old extensions
+	int		rvValueFlags;
+	BYTE	rvFree2[VALUES_NUMBEROF_ALTERABLE];			// for compatiblity with old extensions
+	LPTSTR* rvpStrings;
+	int		rvNumberOfStrings;
+	LPTSTR	rvFree3[STRINGS_NUMBEROF_ALTERABLE - 2];		// for compatiblity with old extensions
+} rVal25P;
+
+// 2.5 unlimited values
+typedef struct tagRV25 {
+	CValue* rvpValues;	
+	long	rvNumberOfValues;
+	long	rvFree1[VALUES_NUMBEROF_ALTERABLE - 2];
+	long	rvValueFlags;
+	BYTE	rvFree2[VALUES_NUMBEROF_ALTERABLE];
+	LPTSTR	rvStrings[STRINGS_NUMBEROF_ALTERABLE];
+} rVal25;
+
+// 2.0 >= build 243, limited values, can be floating point values
+typedef struct tagRV20b {
+	CValue* rvpValues;
+	long	rvFree1[VALUES_NUMBEROF_ALTERABLE - 1];
+	long	rvValueFlags;
+	BYTE	rvFree2[VALUES_NUMBEROF_ALTERABLE];
+	LPSTR	rvStrings[STRINGS_NUMBEROF_ALTERABLE];
+} rVal20b;
+
+#pragma pop
+
 headerObject*			GetHO (LPRO obj);
 tagRCOM*				GetRCOM (LPHO ho);
 tagRM*					GetRM (LPHO ho);

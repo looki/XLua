@@ -61,23 +61,63 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 	if (!rhPtr)
 		return 0;
 
-	int rtHWA = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISHWA, 0, 0, 0);
+	bool rtHWA = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISHWA, 0, 0, 0);
+	bool rtUnicode = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
 
-	const char* name = lua_tostring(L, 1);
+	size_t oiListItemSize = sizeof(objInfoList);
+
+
+#ifdef UNICODE //ACT_EXTSTOPTORQUE <- this should work according to Yves, guess it assumes Unicode?
+	// Fusion 2.5 SDK
+
+	if (!rtUnicode)
+		oiListItemSize -= 24;
+#ifndef HWABETA
+	if (!rtHWA)
+		oiListItemSize -= sizeof(LPVOID);
+#endif
+
+#else
+	// Fusion 2.0 SDK
+
+	if (rtUnicode)
+		oiListItemSize += 24;
+#ifndef HWABETA
+	if (rtHWA)
+		oiListItemSize += sizeof(LPVOID);
+#endif
+
+#endif
 
 	LPOIL oiList = rhPtr->rhOiList;
 	LPOIL oi = 0;
 
-	for (int i = 0; i < rhPtr->rhNumberOi; i++) {
-		LPOIL currentOi;
-		if (rtHWA)
-			currentOi = (LPOIL)((char*)oiList + i * (sizeof(objInfoList) + 4));
-		else
-			currentOi = oiList + i;
-		
-		if (strcmp((char*)(&currentOi->oilName), name) == 0) {
-			oi = currentOi;
-			break;
+	const char* name = lua_tostring(L, 1);
+
+	if (rtUnicode) {
+		const size_t size = strlen(name) + 1;
+		wchar_t* wide_name = new wchar_t[size];
+		mbstowcs(wide_name, name, size);
+
+		for (int i = 0; i < rhPtr->rhNumberOi; i++) {
+			LPOIL currentOi = (LPOIL)(((char*)oiList) + oiListItemSize * i);
+
+			if (!wcscmp((wchar_t *)currentOi->oilName, wide_name)) {
+				oi = currentOi;
+				break;
+			}
+		}
+
+		delete[] wide_name;
+	}
+	else {
+		for (int i = 0; i < rhPtr->rhNumberOi; i++) {
+			LPOIL currentOi = (LPOIL)(((char*)oiList) + oiListItemSize * i);
+
+			if (!strcmp(currentOi->oilName, name)) {
+				oi = currentOi;
+				break;
+			}
 		}
 	}
 

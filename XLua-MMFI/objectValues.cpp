@@ -4,6 +4,24 @@
 // memoize corresponding lookup tables so we only pay the metatable
 // price once
 
+enum {
+	AV_MMF2, // Fixed number of values and strings
+	AV_CF25, // Variable number of values, fixed number of strings
+	AV_CF25PLUS, // Variable number of values and strings
+};
+
+inline int GetAlterablesVersion(LPHO o) {
+	static DWORD mmfVersion = o->hoAdRunHeader->rh4.rh4Mv->mvGetVersion() & MMFBUILD_MASK;
+	if (mmfVersion >= 292) return AV_CF25PLUS;
+	if (mmfVersion >= 282) return AV_CF25;
+	return AV_MMF2;
+}
+
+inline bool IsUnicode(LPHO o) {
+	static bool unicode = o->hoAdRunHeader->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
+	return unicode;
+}
+
 int Values::ValuesIndex (lua_State* L) {
 	LPHO o = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	tagRV* val = GetRV(o);
@@ -106,9 +124,11 @@ int Values::Flag (lua_State* L) {
 	key %= 32;
 
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
+	
+	// Note: no need to check for MMF version here, same format for all
 	tagRV* rv = GetRV(ho);
-
 	lua_pushboolean(L, (rv->rvValueFlags & (1 << key)) != 0);
+
 	return 1;
 }
 
@@ -117,24 +137,43 @@ int Values::Value (lua_State* L) {
 	if (key < 0)
 		return 0;
 
-	//unsigned int key = lua_tointeger(L, 2);
-
 	if (!ObjectCheck(L)) {
-		return 0;
-	}
-
-	//key -= 1;
-	if (key >= VALUES_NUMBEROF_ALTERABLE) {
 		return 0;
 	}
 
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	tagRV* rv = GetRV(ho);
 
-	switch (rv->rvpValues[key].m_type) {
-		case TYPE_LONG: lua_pushinteger(L, rv->rvpValues[key].m_long); break;
-		case TYPE_FLOAT: lua_pushnumber(L, rv->rvpValues[key].m_double); break;
-		case TYPE_STRING: lua_pushstring(L, rv->rvpValues[key].m_pString); break;
+	int altVer = GetAlterablesVersion(ho);
+	int numberOfAlts = altVer == AV_MMF2 ? VALUES_NUMBEROF_ALTERABLE : ((tagRV25*)rv)->rvNumberOfValues;
+
+	if (key >= numberOfAlts) {
+		return 0;
+	}
+
+	CValue* cvalue = altVer == AV_MMF2 ? &rv->rvpValues[key] : &((tagRV25*)rv)->rvpValues[key];
+
+	switch (cvalue->m_type) {
+	case TYPE_LONG: lua_pushinteger(L, cvalue->m_long); break;
+	case TYPE_FLOAT: lua_pushnumber(L, cvalue->m_double); break;
+	case TYPE_STRING: {
+		// Can alterables ever be strings? Perhaps using the MMFI only
+		if (IsUnicode(ho)) {
+			WCHAR* wideString = (WCHAR*)cvalue->m_pString;
+			if (wideString == nullptr) {
+				return 0;
+			}
+			const size_t size = wcslen(wideString) + 1;
+			char* string = new char[size];
+			wcstombs(string, wideString, size);
+			lua_pushstring(L, string);
+			delete[] string;
+		}
+		else {
+			lua_pushstring(L, cvalue->m_pString);
+		}
+		break;
+	}
 	}
 
 	return 1;
@@ -150,19 +189,39 @@ int Values::String (lua_State* L) {
 		return 0;
 	}
 
-	//key -= 1;
-	if (key >= STRINGS_NUMBEROF_ALTERABLE) {
-		return 0;
-	}
-
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	tagRV* rv = GetRV(ho);
 
-	if (rv->rvStrings[key] == NULL) {
+	auto altVer = GetAlterablesVersion(ho);
+	if (altVer != AV_CF25PLUS && key >= STRINGS_NUMBEROF_ALTERABLE) {
+		return 0;
+	}
+
+	LPSTR altString = nullptr;
+	switch (GetAlterablesVersion(ho)) {
+	case AV_MMF2: altString = rv->rvStrings[key]; break;
+	case AV_CF25: altString = ((tagRV25*)rv)->rvStrings[key]; break;
+	case AV_CF25PLUS: {
+		auto rv25p = (tagRV25P*)rv;
+		if (key >= rv25p->rvNumberOfStrings) return 0;
+		altString = rv25p->rvpStrings[key];
+		break;
+	}
+	}
+
+	if (altString == nullptr) {
 		lua_pushstring(L, "");
 	}
+	else if (IsUnicode(ho)) {
+		WCHAR* wideString = (WCHAR*)altString;
+		const size_t size = wcslen(wideString) + 1;
+		char* string = new char[size];
+		wcstombs(string, wideString, size);
+		lua_pushstring(L, string);
+		delete[] string;
+	}
 	else {
-		lua_pushstring(L, rv->rvStrings[key]);
+		lua_pushstring(L, altString);
 	}
 
 	return 1;
@@ -182,9 +241,11 @@ int Values::SetFlag (lua_State* L) {
 	key %= 32;
 
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
+	
+	// Note: no need to check for MMF version here, same format for all
 	tagRV* rv = GetRV(ho);
-
 	rv->rvValueFlags = (rv->rvValueFlags & ~(1 << key)) | (bit << key);
+
 	return 0;
 }
 
@@ -198,25 +259,44 @@ int Values::SetValue (lua_State* L) {
 		return 0;
 	}
 
-	//key -= 1;
-	if (key >= VALUES_NUMBEROF_ALTERABLE) {
-		return 0;
-	}
-
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	tagRV* rv = GetRV(ho);
+
+	auto altVer = GetAlterablesVersion(ho);
+	if (altVer == AV_MMF2 && key >= VALUES_NUMBEROF_ALTERABLE) {
+		return 0;
+	}
 
 	int intval = lua_tointeger(L, 3);
 	double dblval = lua_tonumber(L, 3);
 
+	CValue* cvalue = nullptr;
+	switch (altVer) {
+	case AV_MMF2:
+		cvalue = &rv->rvpValues[key];
+		break;
+	case AV_CF25:
+	case AV_CF25PLUS: {
+		auto rv25 = ((tagRV25*)rv);
+		if (rv25->rvNumberOfValues <= key) {
+			rv25->rvpValues = (CValue*)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, rv25->rvpValues, sizeof(CValue) * (key + 1));
+			auto oldNum = rv25->rvNumberOfValues;
+			memset(rv25->rvpValues + oldNum, 0, sizeof(CValue) * (key + 1 - oldNum));
+			rv25->rvNumberOfValues = key + 1;
+		}
+		cvalue = &rv25->rvpValues[key];
+		break;
+	}
+	}
+
 	// Try to figure out if it's an int or a double.
 	if ((double)intval == dblval) {
-		rv->rvpValues[key].m_type = TYPE_LONG;
-		rv->rvpValues[key].m_long = intval;
+		cvalue->m_type = TYPE_LONG;
+		cvalue->m_long = intval;
 	}
 	else {
-		rv->rvpValues[key].m_type = TYPE_DOUBLE;
-		rv->rvpValues[key].m_double = dblval;
+		cvalue->m_type = TYPE_DOUBLE;
+		cvalue->m_double = dblval;
 	}
 
 	return 0;
@@ -232,17 +312,54 @@ int Values::SetString (lua_State* L) {
 		return 0;
 	}
 
-	//key -= 1;
-	if (key >= STRINGS_NUMBEROF_ALTERABLE) {
-		return 0;
-	}
-
 	LPHO ho = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	tagRV* rv = GetRV(ho);
 
+	auto altVer = GetAlterablesVersion(ho);
+	if (altVer != AV_CF25PLUS && key >= STRINGS_NUMBEROF_ALTERABLE) {
+		return 0;
+	}
+
+	LPSTR* targetString = nullptr;
+	switch (altVer) {
+	case AV_MMF2: targetString = &rv->rvStrings[key]; break;
+	case AV_CF25: targetString = &((tagRV25*)rv)->rvStrings[key]; break;
+	case AV_CF25PLUS: {
+		auto rv25p = (tagRV25P*)rv;
+		// Variable number of strings, ensure we can fit ours
+		_ASSERT(rv25p->rvpStrings);
+		if (rv25p->rvNumberOfStrings <= key) {
+			rv25p->rvpStrings = (LPSTR*)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, rv25p->rvpStrings, sizeof(LPSTR) * (key + 1));
+			auto oldNum = rv25p->rvNumberOfValues;
+			memset(rv25p->rvpStrings + oldNum, 0, sizeof(LPTSTR) * (key + 1 - oldNum));
+			rv25p->rvNumberOfStrings = key + 1;
+		}
+		targetString = &rv25p->rvpStrings[key];
+		break;
+	}
+	}
+
 	unsigned slen = lua_objlen(L, 3);
-	rv->rvStrings[key] = (LPSTR) mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, rv->rvStrings[key], slen + 1);
-	strncpy_s(rv->rvStrings[key], slen + 1, lua_tostring(L, 3), slen + 1);
+	if (IsUnicode(ho)) {
+		auto size = slen + 1;
+		if (*targetString != nullptr) {
+			auto prevValue = *targetString;
+			*targetString = (LPSTR)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, *targetString, sizeof(WCHAR) * size);
+		}
+		else {
+			*targetString = (LPSTR)mvCalloc(ho->hoAdRunHeader->rh4.rh4Mv, sizeof(WCHAR) * size);
+		}
+		mbstowcs((wchar_t*)*targetString, lua_tostring(L, 3), size);
+	}
+	else {
+		if (*targetString != nullptr) {
+			*targetString = (LPSTR)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, *targetString, slen + 1);
+		}
+		else {
+			*targetString = (LPSTR)mvCalloc(ho->hoAdRunHeader->rh4.rh4Mv, slen + 1);
+		}
+		strncpy_s(*targetString, slen + 1, lua_tostring(L, 3), slen + 1);
+	}
 
 	return 0;
 }
