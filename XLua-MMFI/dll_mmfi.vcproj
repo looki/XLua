@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="dll_mmfi"
 	ProjectGUID="{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}"
 	RootNamespace="ext_dyngrid"
@@ -41,8 +41,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/D_CRT_SECURE_NO_WARNINGS /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc"
-				PreprocessorDefinitions="XSDK_DLL"
+				AdditionalIncludeDirectories="..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;c:\Dev\mmf\XLua\XLua\Lua\"
+				PreprocessorDefinitions="XSDK_DLL;COXSDK"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -61,7 +61,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="mmfs2.lib xlua.lib"
-				OutputFile="$(OutDir)\mmfi.dll"
+				OutputFile="d:\Dev\mmf\mmfi.dll"
 				AdditionalLibraryDirectories="&quot;..\XLua\Release&quot;;&quot;..\rSDK\Lib&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -117,6 +117,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc"
+				PreprocessorDefinitions="COXSDK"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"

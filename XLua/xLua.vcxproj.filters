@@ -1,0 +1,588 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{0debec9e-38c3-4506-9dbe-99d7f40dafd6}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Scintilla">
+      <UniqueIdentifier>{3b40e378-6529-4604-8513-d1e9884eed06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{118f9e5d-e630-4a94-b365-b03cc0521cb4}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Lua">
+      <UniqueIdentifier>{bf006f0d-0df1-4762-9644-e0b1ee8872b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scintilla">
+      <UniqueIdentifier>{59e4cb54-d0d4-49f5-aaa9-6ebdd303f6a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{b52a7216-e7be-4fe8-ad43-6b8bc176aeb7}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="MMF Headers">
+      <UniqueIdentifier>{f99bc888-fff8-4255-bef6-d11b141fa356}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CallStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CallStackFrame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditSci.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditSetup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Edittime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="General.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMMF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaParam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaXLua.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainConditions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainExpressions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XLuaGlobal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XLuaObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XLuaState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\Accessor.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\AutoComplete.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\CallTip.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Catalogue.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\CellBuffer.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\CharacterSet.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\CharClassify.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ContractionState.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Decoration.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Document.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Editor.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ExternalLexer.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Indicator.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\KeyMap.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\LexerBase.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\LexerModule.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\LexerNoExceptions.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\LexerSimple.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexers\LexLua.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\LineMarker.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\PerLine.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\PlatWin.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\PositionCache.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\PropSetSimple.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\RESearch.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\RunStyles.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ScintillaBase.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\ScintillaWin.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Selection.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Style.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\StyleContext.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\UniConversion.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ViewStyle.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\WordList.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\XPM.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua\xlua.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua\ldblib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua\loadlib.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CallStackFrame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditSci.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditSetup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Information.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaParam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TaggedType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XLuaGlobal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XLuaObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XLuaState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\dasm_proto.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\dasm_x86.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lapi.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lauxlib.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lcoco.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lcode.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ldebug.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ldo.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lfunc.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lgc.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ljit.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ljit_dasm.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ljit_hints.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ljit_x86.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\llex.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\llimits.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lmem.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lobject.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lopcodes.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lparser.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lstate.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lstring.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ltable.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\ltm.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lua.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lua.hpp">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\luaconf.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\luajit.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lualib.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lundump.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lvm.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\lzio.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\opt.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua\opt_inline.h">
+      <Filter>Header Files\Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\BlitMac.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Ccx.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Ccxhdr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\CfcError.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\CfcFile.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Cncf.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\cncr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Cncy.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Cnpdll.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\colors.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\EVTCCX.H">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Fill.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\FilterMgr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\ImageFlt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\ImgFlt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\ImgFltDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Mvt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Palet.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\PaletCpp.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\PictEdDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Props.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\PTYPE.H">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\SndDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\SoundFilter.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\SoundFilterMgr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\StdDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\Surface.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\SurfaceDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\TigsExt.hpp">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\vendor\SDK\current\Inc\WinMacro.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Ext.def">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Ext.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="Setup.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="CallStack.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Data.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FlagsPrefs.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LuaMMF.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LuaXLua.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\Accessor.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\AutoComplete.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\CallTip.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Catalogue.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\CellBuffer.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\CharacterSet.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\CharClassify.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\ContractionState.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Decoration.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Document.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Editor.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\ExternalLexer.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\FontQuality.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\include\ILexer.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Indicator.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\KeyMap.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\LexAccessor.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\LexerBase.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\LexerModule.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\LexerNoExceptions.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\LexerSimple.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\LineMarker.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\OptionSet.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Partitioning.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\PerLine.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\include\Platform.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\PositionCache.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\PropSetSimple.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\RESearch.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\RunStyles.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\include\SciLexer.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\include\Scintilla.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\ScintillaBase.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\include\ScintillaWidget.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Selection.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\SplitVector.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\Style.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\StyleContext.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\SVector.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\UniConversion.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\ViewStyle.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\lexlib\WordList.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Scintilla\src\XPM.h">
+      <Filter>Header Files\Scintilla</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EXTICON.BMP">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EXTIMG.BMP">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

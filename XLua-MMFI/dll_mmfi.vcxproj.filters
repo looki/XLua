@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\XSDK">
+      <UniqueIdentifier>{77fae444-346c-4539-ac97-ce4dba8ddf31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\XSDK">
+      <UniqueIdentifier>{6c950afe-314a-4efa-8a22-895ee675d87b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="MMF Headers">
+      <UniqueIdentifier>{4da679e1-8dbd-4782-a810-635ce922d56a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="class.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="collisions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="common.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extXLuaSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="frame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inputKeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="inputMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kcArray.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mmfi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objectAnimations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objectCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objectMovements.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objectSprites.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objectValues.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="runtime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="runtimeGlobals.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="system.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xsurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xsdk_surfaceref.cpp">
+      <Filter>Source Files\XSDK</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="class.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="collisions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frame.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kcobject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="runtime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="system.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xlua.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xsurface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="surfaceref.h">
+      <Filter>Header Files\XSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="xsdk.h">
+      <Filter>Header Files\XSDK</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\BlitMac.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Ccx.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Ccxhdr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\CfcError.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\CfcFile.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Cncf.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\cncr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Cncy.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Cnpdll.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\colors.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\EVTCCX.H">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Fill.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\FilterMgr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\ImageFlt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\ImgFlt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\ImgFltDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\MagicRDATA.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Mvt.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\oop_ext.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Palet.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\PaletCpp.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\PictEdDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Props.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\PTYPE.H">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\rCreateObject.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\rCreateRunObject.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\rGetDependencies.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\rTemplate.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\SndDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\SoundFilter.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\SoundFilterMgr.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\StdDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\Surface.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\SurfaceDefs.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\TemplateInc.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\WinMacro.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rSDK\Inc\WrapFunctions.h">
+      <Filter>MMF Headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

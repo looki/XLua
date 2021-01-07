@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="xLua"
 	ProjectGUID="{5B944B67-24E5-4F6A-A389-A1BDCCEB29B4}"
 	RootNamespace="xLua"
@@ -379,7 +379,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="odbc32.lib odbccp32.lib mmfs2.lib imm32.lib"
-				OutputFile="c:\program files (x86)\multimedia fusion 2\extensions\xlua.mfx"
+				OutputFile="c:\mmf2\extensions\xlua.mfx"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\rSDK\Lib\"
@@ -453,7 +453,7 @@
 				AdditionalOptions="/D_CRT_SECURE_NO_WARNINGS /D &quot;_SECURE_SCL=0&quot;"
 				Optimization="3"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="..\..\vendor\SDK\current\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers"
+				AdditionalIncludeDirectories="..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers"
 				PreprocessorDefinitions="XLUA_LEGACY;NDEBUG;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER"
 				StringPooling="true"
 				ExceptionHandling="1"

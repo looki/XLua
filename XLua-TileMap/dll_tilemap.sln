@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_mmfi", "dll_mmfi.vcxproj", "{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll_tilemap", "ext_dyngrid.vcxproj", "{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}"
 EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug MMF2|Win32 = Debug MMF2|Win32
 		Debug|Win32 = Debug|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}.Debug MMF2|Win32.ActiveCfg = Debug MMF2|Win32
-		{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}.Debug MMF2|Win32.Build.0 = Debug MMF2|Win32
 		{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}.Debug|Win32.ActiveCfg = Debug|Win32
 		{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}.Debug|Win32.Build.0 = Debug|Win32
 		{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}.Release|Win32.ActiveCfg = Release|Win32
@@ -21,8 +21,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FC58241C-8D3E-4E7B-BC28-20F3DFEAD2A3}
 	EndGlobalSection
 EndGlobal

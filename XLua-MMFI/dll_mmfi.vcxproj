@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug MMF2|Win32">
+      <Configuration>Debug MMF2</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}</ProjectGuid>
+    <RootNamespace>ext_dyngrid</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MMF2|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141_xp</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug MMF2|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>14.0.23107.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug MMF2|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XSDK_DLL;COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>d:\Dev\Fusion\MFAs\XLua\ext\mmfi.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug MMF2|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XSDK_DLL;COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>d:\Dev\Fusion\MFAs\XLua\ext\mmfi.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)mmfi.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="class.cpp" />
+    <ClCompile Include="collisions.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="extSurface.cpp" />
+    <ClCompile Include="extXLuaSurface.cpp" />
+    <ClCompile Include="frame.cpp" />
+    <ClCompile Include="inputKeyboard.cpp" />
+    <ClCompile Include="inputMouse.cpp" />
+    <ClCompile Include="kcArray.cpp" />
+    <ClCompile Include="mmfi.cpp" />
+    <ClCompile Include="object.cpp" />
+    <ClCompile Include="objectAnimations.cpp" />
+    <ClCompile Include="objectCommon.cpp" />
+    <ClCompile Include="objectMovements.cpp" />
+    <ClCompile Include="objectSprites.cpp" />
+    <ClCompile Include="objectValues.cpp" />
+    <ClCompile Include="runtime.cpp" />
+    <ClCompile Include="runtimeGlobals.cpp" />
+    <ClCompile Include="system.cpp" />
+    <ClCompile Include="window.cpp" />
+    <ClCompile Include="xsdk_surfaceref.cpp" />
+    <ClCompile Include="xsurface.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\rSDK\Inc\BlitMac.h" />
+    <ClInclude Include="..\rSDK\Inc\Ccx.h" />
+    <ClInclude Include="..\rSDK\Inc\Ccxhdr.h" />
+    <ClInclude Include="..\rSDK\Inc\CfcError.h" />
+    <ClInclude Include="..\rSDK\Inc\CfcFile.h" />
+    <ClInclude Include="..\rSDK\Inc\Cncf.h" />
+    <ClInclude Include="..\rSDK\Inc\cncr.h" />
+    <ClInclude Include="..\rSDK\Inc\Cncy.h" />
+    <ClInclude Include="..\rSDK\Inc\Cnpdll.h" />
+    <ClInclude Include="..\rSDK\Inc\colors.h" />
+    <ClInclude Include="..\rSDK\Inc\EVTCCX.H" />
+    <ClInclude Include="..\rSDK\Inc\Fill.h" />
+    <ClInclude Include="..\rSDK\Inc\FilterMgr.h" />
+    <ClInclude Include="..\rSDK\Inc\ImageFlt.h" />
+    <ClInclude Include="..\rSDK\Inc\ImgFlt.h" />
+    <ClInclude Include="..\rSDK\Inc\ImgFltDefs.h" />
+    <ClInclude Include="..\rSDK\Inc\MagicRDATA.h" />
+    <ClInclude Include="..\rSDK\Inc\Mvt.h" />
+    <ClInclude Include="..\rSDK\Inc\oop_ext.h" />
+    <ClInclude Include="..\rSDK\Inc\Palet.h" />
+    <ClInclude Include="..\rSDK\Inc\PaletCpp.h" />
+    <ClInclude Include="..\rSDK\Inc\PictEdDefs.h" />
+    <ClInclude Include="..\rSDK\Inc\Props.h" />
+    <ClInclude Include="..\rSDK\Inc\PTYPE.H" />
+    <ClInclude Include="..\rSDK\Inc\rCreateObject.h" />
+    <ClInclude Include="..\rSDK\Inc\rCreateRunObject.h" />
+    <ClInclude Include="..\rSDK\Inc\rGetDependencies.h" />
+    <ClInclude Include="..\rSDK\Inc\rTemplate.h" />
+    <ClInclude Include="..\rSDK\Inc\SndDefs.h" />
+    <ClInclude Include="..\rSDK\Inc\SoundFilter.h" />
+    <ClInclude Include="..\rSDK\Inc\SoundFilterMgr.h" />
+    <ClInclude Include="..\rSDK\Inc\StdDefs.h" />
+    <ClInclude Include="..\rSDK\Inc\Surface.h" />
+    <ClInclude Include="..\rSDK\Inc\SurfaceDefs.h" />
+    <ClInclude Include="..\rSDK\Inc\TemplateInc.h" />
+    <ClInclude Include="..\rSDK\Inc\WinMacro.h" />
+    <ClInclude Include="..\rSDK\Inc\WrapFunctions.h" />
+    <ClInclude Include="class.h" />
+    <ClInclude Include="collisions.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="enum.h" />
+    <ClInclude Include="ext.h" />
+    <ClInclude Include="extobject.h" />
+    <ClInclude Include="frame.h" />
+    <ClInclude Include="inline.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="kc.h" />
+    <ClInclude Include="kcobject.h" />
+    <ClInclude Include="object.h" />
+    <ClInclude Include="runtime.h" />
+    <ClInclude Include="surfaceref.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="type.h" />
+    <ClInclude Include="window.h" />
+    <ClInclude Include="xlua.h" />
+    <ClInclude Include="xsdk.h" />
+    <ClInclude Include="xsurface.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
