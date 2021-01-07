@@ -215,11 +215,11 @@ int Sprites::SetAngle (lua_State *L) {
 	if (rtHWA) {
 		float val = (float) lua_tonumber(L, PARAM1);
 		com->rcOldAngle = com->rcAngle;
-		com->rcAngle = *(long*) &val;
+		*((float*)&com->rcAngle) = val;
 	}
 	else {
 		com->rcOldAngle = com->rcAngle;
-		com->rcAngle = lua_tointeger(L, PARAM1) % 360;
+		*((long*)&com->rcAngle) = lua_tointeger(L, PARAM1) % 360;
 	}
 
 	com->rcChanged = 1;
