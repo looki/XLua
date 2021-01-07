@@ -141,7 +141,7 @@ EXPORTS
 	lua_isuserdata			@1028
 	lua_lessthan			@1029
 	lua_load				@1030
-	lua_newcthread			@1031
+	;lua_newcthread			@1031
 	lua_newuserdata			@1032
 	lua_next				@1033
 	lua_objlen				@1034
