@@ -11,6 +11,7 @@ public:
 
 	static int	NewObject (lua_State* L);
 	static LPHO	GetObject (lua_State* L, int index);
+	static int	ResetObjectCache(lua_State* L);
 
 	static int	IndexMetamethod (lua_State* L);
 	static int	NewIndexMetamethod (lua_State* L);

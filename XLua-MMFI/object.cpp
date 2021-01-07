@@ -123,6 +123,15 @@ LPHO Object::GetObject (lua_State* L, int index) {
 	return ho;
 }
 
+int Object::ResetObjectCache (lua_State * L) {
+	LPRH rh = xlua_get_run_header(L);
+
+	lua_pushstring(L, KEY_POOL_OBJECT);
+	lua_createtable(L, 0, 0);
+	lua_rawset(L, LUA_REGISTRYINDEX);
+	return 0;
+}
+
 int Object::NewObject (lua_State* L) {
 	LPRH rh = xlua_get_run_header(L);
 

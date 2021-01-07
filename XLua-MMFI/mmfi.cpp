@@ -9,7 +9,7 @@
 
 #include "xsurface.h"
 
-void PushStandardClosure (lua_State* L, lua_CFunction func) {
+void PushStandardClosure(lua_State* L, lua_CFunction func) {
 	lua_pushstring(L, KEY_POOL_OBJECT);
 	lua_rawget(L, LUA_REGISTRYINDEX);
 	lua_pushstring(L, KEY_POOL_CLASS);
@@ -18,7 +18,7 @@ void PushStandardClosure (lua_State* L, lua_CFunction func) {
 	lua_pushcclosure(L, func, 2);
 }
 
-extern "C" __declspec(dllexport) int luaopen_mmfi (lua_State *L) {
+extern "C" __declspec(dllexport) int luaopen_mmfi(lua_State * L) {
 
 	// Registry
 	lua_pushstring(L, KEY_POOL_OBJECT);
@@ -90,6 +90,9 @@ extern "C" __declspec(dllexport) int luaopen_mmfi (lua_State *L) {
 
 	PushStandardClosure(L, ObjectClass::NewObjectClass);
 	lua_setfield(L, -2, "newObjectClass");
+
+	PushStandardClosure(L, Object::ResetObjectCache);
+	lua_setfield(L, -2, "resetObjectCache");
 
 	// Enums
 	for (int i = 0; ; i++) {
