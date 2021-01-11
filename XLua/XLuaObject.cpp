@@ -140,3 +140,8 @@ LPRH xlua_get_run_header (lua_State* L) {
 
 	return state->rdList.front()->rdPtr->rHo.hoAdRunHeader;
 }
+
+int xlua_get_restart_index () {
+	extern int g_restart_index;
+	return g_restart_index;
+}

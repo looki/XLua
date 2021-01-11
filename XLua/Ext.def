@@ -109,6 +109,7 @@ EXPORTS
 
 	xlua_get_object			@900
 	xlua_get_run_header		@901
+	xlua_get_restart_index  @902
 
 	lua_atpanic				@1000
 	lua_call				@1001

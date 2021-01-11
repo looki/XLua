@@ -23,6 +23,7 @@ typedef rRundata* LPRDATA;
 
 LPRO xlua_get_object (lua_State* L, int objid);
 LPRH xlua_get_run_header (lua_State* L);
+int xlua_get_restart_index ();
 //bool xlua_object_exists (lua_State* L);
 
 #endif

@@ -349,6 +349,8 @@ BOOL WINAPI LoadRunObject(LPRDATA rdPtr, HANDLE hf)
 
 // XLuaGlobal* LGLOB = new XLuaGlobal();
 
+int g_restart_index = 0;
+
 // -------------------
 // StartApp
 // -------------------
@@ -357,6 +359,7 @@ BOOL WINAPI LoadRunObject(LPRDATA rdPtr, HANDLE hf)
 // 
 void WINAPI DLLExport StartApp(mv _far *mV, CRunApp* pApp)
 {
+	g_restart_index += 1 << 16;
 	/*LGLOB = (XLuaGlobal*) mV->mvGetExtUserData(pApp, hInstLib);
 	if (LGLOB != NULL) {
 		delete LGLOB;
@@ -389,7 +392,7 @@ void WINAPI DLLExport EndApp(mv _far *mV, CRunApp* pApp)
 // 
 void WINAPI DLLExport StartFrame(mv _far *mV, DWORD dwReserved, int nFrameIndex)
 {
-	
+	g_restart_index++;
 }
 
 // -------------------

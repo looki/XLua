@@ -362,3 +362,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/XLua-MMFI/Debug MMF2/vc141.idb
+/XLua-MMFI/Debug MMF2/dll_mmfi.exp

@@ -123,15 +123,6 @@ LPHO Object::GetObject (lua_State* L, int index) {
 	return ho;
 }
 
-int Object::ResetObjectCache (lua_State * L) {
-	LPRH rh = xlua_get_run_header(L);
-
-	lua_pushstring(L, KEY_POOL_OBJECT);
-	lua_createtable(L, 0, 0);
-	lua_rawset(L, LUA_REGISTRYINDEX);
-	return 0;
-}
-
 int Object::NewObject (lua_State* L) {
 	LPRH rh = xlua_get_run_header(L);
 
@@ -143,6 +134,8 @@ int Object::NewObject (lua_State* L) {
 
 	int hoNum = lua_tointeger(L, 1) & 0xFFFF;
 	LPHO obj = rh->rhObjectList[hoNum].oblOffset;
+	if (!obj)
+		return 0;
 	int fixed = obj->hoCreationId << 16 | obj->hoNumber;
 
 	// Check if we cached the object
@@ -151,10 +144,15 @@ int Object::NewObject (lua_State* L) {
 	lua_pushinteger(L, fixed);								// +2
 	lua_rawget(L, -2);										// +2 = Object Cached Table
 
-	if (lua_istable(L, -1))
+	// TODO: In our testing, lua_istable always returns false here, meaning the cache
+	// goes unused. However, let's hedge our bets and simply disable it, because
+	// if it does go used in some cases, it'll probably lead to invalid runtime pointers.
+	if (false && lua_istable(L, -1)) {
 		return 1;
-	else
+	}
+	else {
 		lua_pop(L, 1);										// +1
+	}
 
 	// Check if we cached the class
 	lua_pushstring(L, KEY_POOL_CLASS);						// +2
@@ -221,7 +219,7 @@ int Object::NewObject (lua_State* L) {
 	lua_setmetatable(L, -2);								// +4
 
 	// Cache table
-	lua_pushinteger(L, fixed);								// +5
+	lua_pushinteger(L, 9999);								// +5
 	lua_pushvalue(L, -2);									// +6
 	lua_rawset(L, base + 1);								// +4
 

@@ -91,9 +91,6 @@ extern "C" __declspec(dllexport) int luaopen_mmfi(lua_State * L) {
 	PushStandardClosure(L, ObjectClass::NewObjectClass);
 	lua_setfield(L, -2, "newObjectClass");
 
-	PushStandardClosure(L, Object::ResetObjectCache);
-	lua_setfield(L, -2, "resetObjectCache");
-
 	// Enums
 	for (int i = 0; ; i++) {
 		if (mmfiEnum[i].name == 0)

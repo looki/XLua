@@ -61,8 +61,8 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 	if (!rhPtr)
 		return 0;
 
-	bool rtHWA = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISHWA, 0, 0, 0);
-	bool rtUnicode = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
+	static bool rtHWA = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISHWA, 0, 0, 0);
+	static bool rtUnicode = rhPtr->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
 
 	size_t oiListItemSize = sizeof(objInfoList);
 
@@ -96,7 +96,7 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 
 	if (rtUnicode) {
 		const size_t size = strlen(name) + 1;
-		wchar_t* wide_name = new wchar_t[size];
+		wchar_t wide_name[25] = {};
 		mbstowcs(wide_name, name, size);
 
 		for (int i = 0; i < rhPtr->rhNumberOi; i++) {
@@ -107,8 +107,6 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 				break;
 			}
 		}
-
-		delete[] wide_name;
 	}
 	else {
 		for (int i = 0; i < rhPtr->rhNumberOi; i++) {
@@ -124,16 +122,21 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 	if (!oi)
 		return 0;
 
+	static int restartIndex;
+	bool cacheIsValid = xlua_get_restart_index() == restartIndex;
+	restartIndex = xlua_get_restart_index();
+
 	// Check if we cached the Class
 	lua_pushstring(L, KEY_POOL_CLASS);
 	lua_rawget(L, LUA_REGISTRYINDEX);
 	lua_pushinteger(L, oi->oilOi);
 	lua_rawget(L, -2);
 
-	if (lua_istable(L, -1))
-		return 1;
-	else
-		lua_pop(L, 1);
+	if (lua_istable(L, -1)) {
+		if (cacheIsValid)
+			return 1;
+	}
+	lua_pop(L, 1);
 
 	int (*index_method)(lua_State*L) = ObjectClass::IndexMetamethod;
 	int (*newindex_method)(lua_State*L) = ObjectClass::IndexMetamethod;
