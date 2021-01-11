@@ -59,10 +59,16 @@ lua_CFunction FindFunction (const char* key, const FunctionPair* fp, int fpSize)
 
 // -----
 
-int ObjectCheck (LPHO ho, LPRH rh, DWORD fixed) {
+int ObjectCheck(LPHO ho, LPRH rh, DWORD fixed) {
 	LPOBL objList = rh->rhObjectList;
 	objectsList e = objList[0x0000FFFF & fixed];
-	if (e.oblOffset != ho || ho->hoFlags & HOF_DESTROYED) {
+	if (!e.oblOffset) {
+		return 0;
+	}
+	if (fixed != (e.oblOffset->hoCreationId << 16 | e.oblOffset->hoNumber)) {
+		return 0;
+	}
+	if (e.oblOffset != ho || (ho->hoFlags & HOF_DESTROYED)) {
 		return 0;
 	}
 
@@ -74,7 +80,7 @@ int ObjectCheck (lua_State* L) {
 	int fixed = lua_tointeger(L, lua_upvalueindex(UV_OBJECT_FIXED));
 	LPRH rh = (LPRH)lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPRH));
 
-	return (obj, rh, fixed);
+	return ObjectCheck(obj, rh, fixed);
 }
 
 int ObjectCheck (lua_State* L, int index) {

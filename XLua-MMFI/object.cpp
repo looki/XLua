@@ -132,11 +132,14 @@ int Object::NewObject (lua_State* L) {
 
 	lua_checkstack(L, base + 10);
 
-	int hoNum = lua_tointeger(L, 1) & 0xFFFF;
+	uint32_t requestedFixed = lua_tointeger(L, 1);
+	uint32_t hoNum = requestedFixed & 0xFFFF;
 	LPHO obj = rh->rhObjectList[hoNum].oblOffset;
 	if (!obj)
 		return 0;
-	int fixed = obj->hoCreationId << 16 | obj->hoNumber;
+	uint32_t fixed = (obj->hoCreationId << 16) | obj->hoNumber;
+	if (requestedFixed != fixed)
+		return 0;
 
 	// Check if we cached the object
 	lua_pushstring(L, KEY_POOL_OBJECT);						// +1

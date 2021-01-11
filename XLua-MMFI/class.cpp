@@ -279,7 +279,7 @@ int ObjectClass::ObjectList (lua_State* L) {
 	int i = 1;
 	while (true) {
 		lua_pushcfunction(L, Object::NewObject);
-		lua_pushinteger(L, cur->hoOi << 16 | cur->hoNumber);
+		lua_pushinteger(L, (cur->hoCreationId << 16) | cur->hoNumber);
 		lua_call(L, 1, 1);
 		lua_rawseti(L, -2, i++);
 
