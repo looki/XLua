@@ -60,9 +60,6 @@ lua_CFunction FindFunction (const char* key, const FunctionPair* fp, int fpSize)
 // -----
 
 int ObjectCheck(LPHO ho, LPRH rh, DWORD fixed) {
-	//char s[100] = {};
-	//sprintf(s, "%d\n", fixed);
-	//OutputDebugString(s);
 	LPOBL objList = rh->rhObjectList;
 	objectsList e = objList[0x0000FFFF & fixed];
 	if (!e.oblOffset) {

@@ -4,7 +4,7 @@
 int InvalidObject(lua_State* L, const char* key) {
 	int fixed = lua_tonumber(L, lua_upvalueindex(UV_OBJECT_FIXED));
 	char ebuf[255];
-	sprintf_s((char*)&ebuf, 255, "Attempt to access field '%s' on an invalid object (fixed value %d = creation ID %d, number %d)", key, fixed, (fixed >> 16) & 0xffff, fixed & 0xffff);
+	sprintf_s((char*)&ebuf, 255, "Attempt to access field '%s' on an invalid object (fixed value %d)", key, fixed);
 	lua_pushstring(L, (char*)&ebuf);
 	lua_error(L);
 	return 0;
