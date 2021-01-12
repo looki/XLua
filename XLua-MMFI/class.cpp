@@ -122,20 +122,14 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 	if (!oi)
 		return 0;
 
-	static int restartIndex;
-	bool cacheIsValid = xlua_get_restart_index() == restartIndex;
-	restartIndex = xlua_get_restart_index();
-
 	// Check if we cached the Class
 	lua_pushstring(L, KEY_POOL_CLASS);
 	lua_rawget(L, LUA_REGISTRYINDEX);
 	lua_pushinteger(L, oi->oilOi);
 	lua_rawget(L, -2);
 
-	if (lua_istable(L, -1)) {
-		if (cacheIsValid)
-			return 1;
-	}
+	if (lua_istable(L, -1))
+		return 1;
 	lua_pop(L, 1);
 
 	int (*index_method)(lua_State*L) = ObjectClass::IndexMetamethod;

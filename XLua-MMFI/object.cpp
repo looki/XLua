@@ -4,7 +4,7 @@
 int InvalidObject(lua_State* L, const char* key) {
 	int fixed = lua_tonumber(L, lua_upvalueindex(UV_OBJECT_FIXED));
 	char ebuf[255];
-	sprintf_s((char*)&ebuf, 255, "Attempt to access field '%s' on an invalid object (fixed value %d)", key, fixed);
+	sprintf_s((char*)&ebuf, 255, "Attempt to access field '%s' on an invalid object (fixed value %d = creation ID %d, number %d)", key, fixed, (fixed >> 16) & 0xffff, fixed & 0xffff);
 	lua_pushstring(L, (char*)&ebuf);
 	lua_error(L);
 	return 0;
@@ -166,15 +166,10 @@ int Object::NewObject (lua_State* L) {
 	lua_pushinteger(L, fixed);								// +2
 	lua_rawget(L, -2);										// +2 = Object Cached Table
 
-	// TODO: In our testing, lua_istable always returns false here, meaning the cache
-	// goes unused. However, let's hedge our bets and simply disable it, because
-	// if it does go used in some cases, it'll probably lead to invalid runtime pointers.
-	if (false && lua_istable(L, -1)) {
+	if (lua_istable(L, -1)) {
 		return 1;
 	}
-	else {
-		lua_pop(L, 1);										// +1
-	}
+	lua_pop(L, 1);											// +1
 
 	// Check if we cached the class
 	lua_pushstring(L, KEY_POOL_CLASS);						// +2
@@ -217,7 +212,7 @@ int Object::NewObject (lua_State* L) {
 
 	// Add __index
 	lua_pushnumber(L, TYPE_OBJECT);							// +6
-	lua_pushlightuserdata(L, (void*)obj);					// +7
+	lua_pushlightuserdata(L, (void*)obj);					// +7	
 	lua_pushnumber(L, fixed);								// +8
 	lua_pushlightuserdata(L, (void*)obj->hoAdRunHeader);	// +9
 	lua_pushvalue(L, base + 3);								// +10
@@ -241,7 +236,7 @@ int Object::NewObject (lua_State* L) {
 	lua_setmetatable(L, -2);								// +4
 
 	// Cache table
-	lua_pushinteger(L, 9999);								// +5
+	lua_pushinteger(L, fixed);								// +5
 	lua_pushvalue(L, -2);									// +6
 	lua_rawset(L, base + 1);								// +4
 

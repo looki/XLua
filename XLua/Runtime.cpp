@@ -390,9 +390,18 @@ void WINAPI DLLExport EndApp(mv _far *mV, CRunApp* pApp)
 // -------------------
 // Called when the frame starts or restarts.
 // 
+
+
+extern void(*g_frameChangeHooks[100])(lua_State*, int);
+extern lua_State* g_frameChangeStates[100];
+extern int g_frameChangeHookCount;
+
 void WINAPI DLLExport StartFrame(mv _far *mV, DWORD dwReserved, int nFrameIndex)
 {
-	g_restart_index++;
+	for (int i = 0; i < g_frameChangeHookCount; i++) {
+		if (g_frameChangeHooks[i])
+			g_frameChangeHooks[i](g_frameChangeStates[i], nFrameIndex);
+	}
 }
 
 // -------------------
