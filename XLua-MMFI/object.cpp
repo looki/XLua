@@ -1,13 +1,31 @@
 #include "object.h"
 #include "class.h"
 
+int InvalidObject(lua_State* L, const char* key) {
+	int fixed = lua_tonumber(L, lua_upvalueindex(UV_OBJECT_FIXED));
+	char ebuf[255];
+	sprintf_s((char*)&ebuf, 255, "Attempt to access field '%s' on an invalid object (fixed value %d)", key, fixed);
+	lua_pushstring(L, (char*)&ebuf);
+	lua_error(L);
+	return 0;
+}
+
 int Object::IndexMetamethod (lua_State* L) {
 	if (lua_tonumber(L, lua_upvalueindex(UV_TYPE)) != TYPE_OBJECT)
 		return 0;
 
-	// Check that object is valid
-	if (!ObjectCheck(L))
+	bool valid = ObjectCheck(L);
+	const char* key = lua_tostring(L, 2);
+
+	if (!strcmp(key, "alive")) {
+		lua_pushboolean(L, valid);
+		return 1;
+	}
+
+	if (!valid) {
+		InvalidObject(L, key);
 		return 0;
+	}
 
 	int ret;
 	
@@ -47,6 +65,7 @@ int Object::NewIndexMetamethod (lua_State* L) {
 
 	// Check that object is valid
 	if (!ObjectCheck(L)) {
+		InvalidObject(L, lua_tostring(L, 2));
 		return 0;
 	}
 
@@ -78,7 +97,7 @@ int Object::InheritCommon (lua_State* L) {
 	lua_rawget(L, lua_upvalueindex(UV_OBJECT_CLASS));
 	if (!lua_istable(L, -1))
 		return 0;
-
+	
 	lua_pushvalue(L, 2);
 	lua_rawget(L, -2);
 

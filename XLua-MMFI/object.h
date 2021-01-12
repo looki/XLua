@@ -17,6 +17,7 @@ public:
 
 	static int	InheritCommon (lua_State* L);
 	static int	MemoClosure (lua_State* L, const char* key, lua_CFunction lfunc);
+
 };
 
 class Common {
