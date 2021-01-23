@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "Lua/lua.hpp"
+#include "lua.hpp"
 
 enum LuaParamType {
 	LUA_PARAM_NIL = 0x1,

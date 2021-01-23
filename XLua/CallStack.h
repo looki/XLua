@@ -7,7 +7,7 @@
 #include	"LuaParam.h"
 #include	"CallStackFrame.h"
 
-#include	"Lua/lua.hpp"
+#include	"lua.hpp"
 
 enum {
 	MF_FUNCTION_GROUP_DEF = 1,

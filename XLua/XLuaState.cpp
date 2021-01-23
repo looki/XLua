@@ -1231,8 +1231,8 @@ int XLuaState::LuaC_Error (lua_State *L) {
 	return 0;
 }
 
-#include "Lua/opt.h"
-#include "Lua/opt_inline.h"
+#include "opt.h"
+#include "opt_inline.h"
 
 int XLuaState::LuaC_SetupJIT (lua_State* L) {
 	XLuaState* state = XLuaGlobal::Get().GetStateByState(L);

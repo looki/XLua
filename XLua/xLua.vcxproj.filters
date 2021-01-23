@@ -180,13 +180,13 @@
     <ClCompile Include="Scintilla\src\XPM.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
-    <ClCompile Include="Lua\xlua.cpp">
+    <ClCompile Include="LuaJIT-1.1.8\src\ldblib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Lua\ldblib.c">
+    <ClCompile Include="LuaJIT-1.1.8\src\loadlib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Lua\loadlib.c">
+    <ClCompile Include="LuaJIT-1.1.8\src\xlua.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

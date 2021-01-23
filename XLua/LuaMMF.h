@@ -6,7 +6,7 @@
 
 #include	<windows.h>
 
-#include	"Lua/lua.hpp"
+#include	"lua.hpp"
 
 class XLuaState;
 

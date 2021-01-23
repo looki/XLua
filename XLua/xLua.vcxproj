@@ -209,7 +209,7 @@
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;RUN_ONLY;COMPILE_SMALL;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -258,7 +258,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;RUN_ONLY;VITALIZE;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -307,7 +307,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.\Scintilla\include;..\rSDK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XLUA_LEGACY;NDEBUG;RUN_ONLY;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -359,7 +359,7 @@
     <ClCompile>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XLUA_LEGACY;_DEBUG;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -379,7 +379,7 @@
       <AdditionalIncludeDirectories>..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>d:\git\LuaJIT-1.1.8\src\lua51.lib;odbc32.lib;odbccp32.lib;mmfs2.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>LuaJIT-1.1.8\bin\lua51.lib;odbc32.lib;odbccp32.lib;mmfs2.lib;imm32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>c:\Program Files (x86)\Clickteam Fusion Developer 2.5\Extensions\xlua.mfx</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>..\rSDK\Lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -411,7 +411,7 @@
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Full</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XLUA_LEGACY;NDEBUG;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -466,7 +466,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;RUN_ONLY;COMPILE_SMALL;VITALIZE;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -513,7 +513,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;COMPILE_SMALL;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -562,7 +562,7 @@
       <Optimization>MaxSpeed</Optimization>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>.\xLua\lua514;..\..\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -615,7 +615,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.\Scintilla\include;..\rSDK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>DDEBUG;RUN_ONLY;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -669,7 +669,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>.\Scintilla\include;..\rSDK\Inc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>LuaJIT-1.1.8\src;..\rSDK\Inc;.\Scintilla\include;.\Scintilla\src;.\Scintilla\lexlib;.\Scintilla\lexers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;RUN_ONLY;WIN32;_WINDOWS;STRICT;COXSDK;IN_EXT_VERSION2;RSDK;STATIC_BUILD;SCI_NAMESPACE;SCI_LEXER;%(PreprocessorDefinitions);_SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -732,6 +732,9 @@
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Run_Only_Small|Win32'">MinSpace</Optimization>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Vitalize_Small|Win32'">MinSpace</Optimization>
     </ClCompile>
+    <ClCompile Include="LuaJIT-1.1.8\src\ldblib.c" />
+    <ClCompile Include="LuaJIT-1.1.8\src\loadlib.c" />
+    <ClCompile Include="LuaJIT-1.1.8\src\xlua.cpp" />
     <ClCompile Include="LuaMMF.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Run_Only_Nolegacy|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -739,9 +742,6 @@
     <ClCompile Include="LuaXLua.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Run_Only_Nolegacy|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Lua\ldblib.c" />
-    <ClCompile Include="Lua\loadlib.c" />
-    <ClCompile Include="Lua\xlua.cpp" />
     <ClCompile Include="MainActions.cpp" />
     <ClCompile Include="MainConditions.cpp" />
     <ClCompile Include="MainExpressions.cpp" />

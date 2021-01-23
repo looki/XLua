@@ -7,8 +7,8 @@
 #include    "CallStack.h"
 #include	"TaggedType.h"
 
-#include	"Lua/lua.hpp"
-#include	"Lua/lstate.h"
+#include	"lua.hpp"
+#include	"lstate.h"
 
 #ifdef XLUA_LEGACY
 	#include	"LuaXLua.h"

@@ -4,8 +4,8 @@
 #include <list>
 #include <hash_map>
 
-#include "Lua/lua.hpp"
-#include "Lua/lstate.h"
+#include "lua.hpp"
+#include "lstate.h"
 
 // =====================================================================================
 // XLua Global State Manager
