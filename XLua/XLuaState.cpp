@@ -1217,9 +1217,9 @@ int XLuaState::LuaC_Error (lua_State *L) {
 					strcpy_s(message, lua_tostring(L, 1));
 					lua_pop(L, 1);
 					luaL_traceback(L, L, message, 1);
-					bt = lua_tostring(L, 1);
+					bt = lua_tostring(L, -1);
 				}
-
+				
 				lm->RaiseError(bt + "\r\n");
 			}
 			else {
