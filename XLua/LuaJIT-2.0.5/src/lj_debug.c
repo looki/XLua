@@ -562,7 +562,7 @@ LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
   int top = (int)(L->top - L->base);
   int lim = TRACEBACK_LEVELS1;
   lua_Debug ar;
-  if (msg) lua_pushfstring(L, "%s\n", msg);
+  if (msg) lua_pushfstring(L, "%s\r\n", msg);
   lua_pushliteral(L, "stack traceback:");
   while (lua_getstack(L1, level++, &ar)) {
     GCfunc *fn;
@@ -570,7 +570,7 @@ LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
       if (!lua_getstack(L1, level + TRACEBACK_LEVELS2, &ar)) {
 	level--;
       } else {
-	lua_pushliteral(L, "\n\t...");
+	lua_pushliteral(L, "\r\n\t...");
 	lua_getstack(L1, -10, &ar);
 	level = ar.i_ci - TRACEBACK_LEVELS2;
       }
@@ -580,9 +580,9 @@ LUALIB_API void luaL_traceback (lua_State *L, lua_State *L1, const char *msg,
     lua_getinfo(L1, "Snlf", &ar);
     fn = funcV(L1->top-1); L1->top--;
     if (isffunc(fn) && !*ar.namewhat)
-      lua_pushfstring(L, "\n\t[builtin#%d]:", fn->c.ffid);
+      lua_pushfstring(L, "\r\n\t[builtin#%d]:", fn->c.ffid);
     else
-      lua_pushfstring(L, "\n\t%s:", ar.short_src);
+      lua_pushfstring(L, "\r\n\t%s:", ar.short_src);
     if (ar.currentline > 0)
       lua_pushfstring(L, "%d:", ar.currentline);
     if (*ar.namewhat) {
