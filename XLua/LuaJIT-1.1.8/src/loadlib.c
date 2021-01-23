@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.52.1.4 2009/09/09 13:17:16 roberto Exp $
+** $Id: loadlib.c,v 1.52.1.3 2008/08/06 13:29:28 roberto Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -292,7 +292,7 @@ static int gctm (lua_State *L) {
 }
 
 
-static int ll_loadfunc (lua_State *L, const char *path, const char *sym) {
+int ll_loadfunc (lua_State *L, const char *path, const char *sym) {
   void **reg = ll_register(L, path);
   if (*reg == NULL) *reg = ll_load(L, path);
   if (*reg == NULL)
@@ -338,7 +338,7 @@ static int readable (const char *filename) {
 }
 
 
-static const char *pushnexttemplate (lua_State *L, const char *path) {
+const char *pushnexttemplate (lua_State *L, const char *path) {
   const char *l;
   while (*path == *LUA_PATHSEP) path++;  /* skip separators */
   if (*path == '\0') return NULL;  /* no more templates */
@@ -372,7 +372,7 @@ static const char *findfile (lua_State *L, const char *name,
 }
 
 
-static void loaderror (lua_State *L, const char *filename) {
+void loaderror (lua_State *L, const char *filename) {
   luaL_error(L, "error loading module " LUA_QS " from file " LUA_QS ":\n\t%s",
                 lua_tostring(L, 1), filename, lua_tostring(L, -1));
 }
@@ -391,7 +391,7 @@ static int loader_Lua (lua_State *L) {
 }
 
 
-static const char *mkfuncname (lua_State *L, const char *modname) {
+const char *mkfuncname (lua_State *L, const char *modname) {
   const char *funcname;
   const char *mark = strchr(modname, *LUA_IGMARK);
   if (mark) modname = mark + 1;
@@ -450,6 +450,7 @@ static int loader_preload (lua_State *L) {
 static const int sentinel_ = 0;
 #define sentinel	((void *)&sentinel_)
 
+extern int x_require_direct (lua_State *L);
 
 static int ll_require (lua_State *L) {
   const char *name = luaL_checkstring(L, 1);
@@ -584,9 +585,7 @@ static int ll_seeall (lua_State *L) {
   return 0;
 }
 
-
 /* }====================================================== */
-
 
 
 /* auxiliary mark (for internal use) */
@@ -619,12 +618,17 @@ static const luaL_Reg pk_funcs[] = {
 static const luaL_Reg ll_funcs[] = {
   {"module", ll_module},
   {"require", ll_require},
+  {"x_requirelib", x_require_direct},
   {NULL, NULL}
 };
 
+extern int loader_XLua (lua_State *L);
+extern int loader_XC (lua_State *L);
+extern int loader_XLua_Embedded (lua_State *L);
+extern void x_updatepath (lua_State* L);
 
 static const lua_CFunction loaders[] =
-  {loader_preload, loader_Lua, loader_C, loader_Croot, NULL};
+  {loader_preload, loader_XLua_Embedded, loader_XLua, loader_Lua, loader_XC, loader_C, loader_Croot, NULL};
 
 
 LUALIB_API int luaopen_package (lua_State *L) {
@@ -642,7 +646,7 @@ LUALIB_API int luaopen_package (lua_State *L) {
   lua_pushvalue(L, -1);
   lua_replace(L, LUA_ENVIRONINDEX);
   /* create `loaders' table */
-  lua_createtable(L, sizeof(loaders)/sizeof(loaders[0]) - 1, 0);
+  lua_createtable(L, 0, sizeof(loaders)/sizeof(loaders[0]) - 1);
   /* fill it with pre-defined loaders */
   for (i=0; loaders[i] != NULL; i++) {
     lua_pushcfunction(L, loaders[i]);
@@ -651,6 +655,9 @@ LUALIB_API int luaopen_package (lua_State *L) {
   lua_setfield(L, -2, "loaders");  /* put it in field `loaders' */
   setpath(L, "path", LUA_PATH, LUA_PATH_DEFAULT);  /* set field `path' */
   setpath(L, "cpath", LUA_CPATH, LUA_CPATH_DEFAULT); /* set field `cpath' */
+
+  x_updatepath(L);
+
   /* store config information */
   lua_pushliteral(L, LUA_DIRSEP "\n" LUA_PATHSEP "\n" LUA_PATH_MARK "\n"
                      LUA_EXECDIR "\n" LUA_IGMARK);

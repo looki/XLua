@@ -11,6 +11,8 @@
 #include <string.h>
 #include <time.h>
 
+#include <windows.h>
+
 #define loslib_c
 #define LUA_LIB
 
@@ -19,6 +21,7 @@
 #include "lauxlib.h"
 #include "lualib.h"
 
+static LARGE_INTEGER performanceFrequency = {0};
 
 static int os_pushresult (lua_State *L, int i, const char *filename) {
   int en = errno;  /* calls to Lua API may change this value */
@@ -73,6 +76,17 @@ static int os_getenv (lua_State *L) {
 
 static int os_clock (lua_State *L) {
   lua_pushnumber(L, ((lua_Number)clock())/(lua_Number)CLOCKS_PER_SEC);
+  return 1;
+}
+
+static int os_microclock (lua_State *L) {
+  LARGE_INTEGER lt;
+  if (!performanceFrequency.QuadPart) {
+    QueryPerformanceFrequency(&performanceFrequency);
+  }
+
+  QueryPerformanceCounter(&lt);
+  lua_pushnumber(L, ((lua_Number)lt.QuadPart)/(lua_Number)performanceFrequency.QuadPart);
   return 1;
 }
 
@@ -225,6 +239,7 @@ static const luaL_Reg syslib[] = {
   {"execute",   os_execute},
   {"exit",      os_exit},
   {"getenv",    os_getenv},
+  {"microclock",os_microclock},
   {"remove",    os_remove},
   {"rename",    os_rename},
   {"setlocale", os_setlocale},

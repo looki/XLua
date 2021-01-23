@@ -251,10 +251,6 @@ void XLuaState::LoadEmbedded(const char* name, LPRDATA rdPtr) {
 	LoadString(si->second.script.c_str(), si->second.name.c_str());
 }
 
-extern "C" {
-	//LUALIB_API int luaopen_bit(lua_State* L);
-}
-
 void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
 	unsigned fpcontrol = fp_precision_double();
 	int stat = 0;
@@ -272,7 +268,7 @@ void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
 		case PACKAGE_STRING: stat = lua_cpcall(state, luaopen_string, 0); break;
 		case PACKAGE_DEBUG: stat = lua_cpcall(state, luaopen_debug, 0); break;
 		case PACKAGE_JIT: stat = lua_cpcall(state, luaopen_jit, 0); break;
-		//case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
+		case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
 #ifdef XLUA_LEGACY
 		case PACKAGE_XLUA: stat = 0; xlua.Register(); break;
 #endif
@@ -1254,7 +1250,7 @@ int XLuaState::LuaC_SetupJIT (lua_State* L) {
 
 	luaL_loadbuffer(L, (const char*)(&opt_lua_bytes), opt_lua_sz, "jit.opt");
 	lua_setfield(L, -2, "jit.opt");
-
+	
 	luaL_loadbuffer(L, (const char*)(&opt_inline_lua_bytes), opt_inline_lua_sz, "jit.opt_inline");
 	lua_setfield(L, -2, "jit.opt_inline");
 

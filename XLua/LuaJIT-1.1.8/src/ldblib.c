@@ -1,5 +1,5 @@
 /*
-** $Id: ldblib.c,v 1.104.1.4 2009/08/04 18:50:18 roberto Exp $
+** $Id: ldblib.c,v 1.104.1.3 2008/01/21 13:11:21 roberto Exp $
 ** Interface from Lua to its debug API
 ** See Copyright Notice in lua.h
 */
@@ -45,7 +45,6 @@ static int db_setmetatable (lua_State *L) {
 
 
 static int db_getfenv (lua_State *L) {
-  luaL_checkany(L, 1);
   lua_getfenv(L, 1);
   return 1;
 }
@@ -319,7 +318,7 @@ static int db_debug (lua_State *L) {
 #define LEVELS1	12	/* size of the first part of the stack */
 #define LEVELS2	10	/* size of the second part of the stack */
 
-static int db_errorfb (lua_State *L) {
+int db_errorfb (lua_State *L) {
   int level;
   int firstpart = 1;  /* still before eventual `...' */
   int arg;
@@ -334,7 +333,7 @@ static int db_errorfb (lua_State *L) {
   if (lua_gettop(L) == arg)
     lua_pushliteral(L, "");
   else if (!lua_isstring(L, arg+1)) return 1;  /* message is not a string */
-  else lua_pushliteral(L, "\n");
+  else lua_pushliteral(L, "\r\n");
   lua_pushliteral(L, "stack traceback:");
   while (lua_getstack(L1, level++, &ar)) {
     if (level > LEVELS1 && firstpart) {
@@ -349,7 +348,7 @@ static int db_errorfb (lua_State *L) {
       firstpart = 0;
       continue;
     }
-    lua_pushliteral(L, "\n\t");
+    lua_pushliteral(L, "\r\n\t");
     lua_getinfo(L1, "Snl", &ar);
     lua_pushfstring(L, "%s:", ar.short_src);
     if (ar.currentline > 0)

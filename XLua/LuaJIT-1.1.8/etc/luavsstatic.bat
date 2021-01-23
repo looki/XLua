@@ -9,9 +9,9 @@
 @set MYMT=mt /nologo
 
 cd bin
-%MYCOMPILE% ..\src\l*.c
+%MYCOMPILE% ..\src\l*.c ..\src\bit.c
 del lua.obj luac.obj
-lib /nologo /nodefaultlib /out:lua51.lib l*.obj
+lib /nologo /nodefaultlib /out:lua51.lib l*.obj bit.obj
 rem %MYLINK% /DLL /out:lua51.dll l*.obj
 rem if exist lua51.dll.manifest^
 rem   %MYMT% -manifest lua51.dll.manifest -outputresource:lua51.dll;2
@@ -21,3 +21,4 @@ rem if exist luajit.exe.manifest^
 rem   %MYMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
 del *.obj *.manifest
 cd ..
+
