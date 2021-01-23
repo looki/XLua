@@ -538,10 +538,12 @@ int CallStack::LuaC_StackError (lua_State *L) {
 			if (lm->useBacktrace) {
 				// Let's be lazy about any backtrace calculations
 				if (bt.empty()) {
-					char message[2000] = {};
-					strcpy_s(message, lua_tostring(L, 1));
+					size_t length = 0;
+					lua_tolstring(L, 1, &length);
+					std::vector<char> message(length + 1);
+					memcpy(&message[0], lua_tostring(L, 1), length);
 					lua_pop(L, 1);
-					luaL_traceback(L, L, message, 1);
+					luaL_traceback(L, L, message.data(), 1);
 					
 					std::stringstream bt_build;
 					bt_build << "Event " << state->stack.EventNumber() << ": " << lua_tostring(L, 1) << "\r\n";
