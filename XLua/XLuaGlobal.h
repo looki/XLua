@@ -73,10 +73,17 @@ inline XLuaState* XLuaGlobal::GetState (int sid) {
 	return _stateTable[sid];
 }
 
+#define XLUA_REGISTRY_MAIN_THREAD static_cast<int>('MAIN')
+
 inline XLuaState* XLuaGlobal::GetStateByState (lua_State* state) {
 	XLuaState* ret = _stateLookup[state];
-	if (!ret)
+	if (!ret) {
+		lua_pushinteger(state, XLUA_REGISTRY_MAIN_THREAD);
+		lua_gettable(state, LUA_REGISTRYINDEX);
+		state = static_cast<lua_State*>(lua_touserdata(state, -1));
+		lua_pop(state, 1);
 		ret = _stateLookup[state];
+	}
 	return ret;
 }
 

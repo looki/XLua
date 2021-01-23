@@ -47,9 +47,15 @@ XLuaState::XLuaState ()
 	lua_pushcfunction(state, XLuaState::LuaC_DoCallG);
 	lua_setglobal(state, "DoCallG");
 
-	// REgister print function
+	// Register print function
 	lua_pushcfunction(state, XLuaState::LuaC_Print);
 	lua_setglobal(state, "print");
+
+	// Register pointer to ourself in the registry - workaround to retrieve
+	// the main state in coroutines in LuaJIT 2.0
+	lua_pushinteger(state, XLUA_REGISTRY_MAIN_THREAD);
+	lua_pushlightuserdata(state, state);
+	lua_settable(state, LUA_REGISTRYINDEX);
 
 #ifdef XLUA_LEGACY
 	xlua.Register();
