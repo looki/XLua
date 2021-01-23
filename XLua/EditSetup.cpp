@@ -256,6 +256,9 @@ const char luaLibFuncs[] =
 	"bit.rshift bit.arshift bit.rol bit.ror bit.swap";
 
 void InitEditor (HWND hwnd) {
+#ifdef _UNICODE
+	SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
+#endif
 	SendMessage(hwnd, SCI_SETLEXER, SCLEX_LUA, 0);
 	SendMessage(hwnd, SCI_SETSTYLEBITS, 7, 0);
 
