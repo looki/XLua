@@ -1172,9 +1172,6 @@ int XLuaState::LuaC_Print (lua_State* L) {
 	return 0;
 }
 
-extern "C" int db_errorfb (lua_State *L);
-
-
 static int err(lua_State* L) {
 	const char* msg = lua_tostring(L, 1);
 	puts(msg);
@@ -1210,8 +1207,10 @@ int XLuaState::LuaC_Error (lua_State *L) {
 			if (lm->useBacktrace) {
 				// Let's be lazy about any backtrace calculations
 				if (bt.empty()) {
-					lua_pushinteger(L, 1);
-					db_errorfb(L);
+					char message[2000] = {};
+					strcpy_s(message, lua_tostring(L, 1));
+					lua_pop(L, 1);
+					luaL_traceback(L, L, message, 1);
 					bt = lua_tostring(L, 1);
 				}
 
@@ -1227,9 +1226,6 @@ int XLuaState::LuaC_Error (lua_State *L) {
 	return 0;
 }
 
-#include "opt.h"
-#include "opt_inline.h"
-
 int XLuaState::LuaC_SetupJIT (lua_State* L) {
 	XLuaState* state = XLuaGlobal::Get().GetStateByState(L);
 	if (state == NULL) return 0;
@@ -1243,30 +1239,6 @@ int XLuaState::LuaC_SetupJIT (lua_State* L) {
 	lua_getglobal(L, "jit");
 	lua_getfield(L, -1, "on");
 	lua_call(L, 0, 0);
-
-	// Load opt modules into preload
-	lua_getglobal(L, "package");
-	lua_getfield(L, -1, "preload");
-
-	luaL_loadbuffer(L, (const char*)(&opt_lua_bytes), opt_lua_sz, "jit.opt");
-	lua_setfield(L, -2, "jit.opt");
-	
-	luaL_loadbuffer(L, (const char*)(&opt_inline_lua_bytes), opt_inline_lua_sz, "jit.opt_inline");
-	lua_setfield(L, -2, "jit.opt_inline");
-
-	// Formally load optimizer
-	lua_getglobal(L, "require");
-	lua_pushliteral(L, "jit.opt");
-	if (lua_pcall(L, 1, 1, 0)) {
-		state->RaiseError("Could not load module jit.opt: Optimization is disabled.");
-		return 0;
-	}
-	
-	lua_getfield(L, -1, "start");
-	if (lua_pcall(L, 0, 0, 0)) {
-		state->RaiseError("Could not call jit.opt init function: Optimization is disabled.");
-		return 0;
-	}
 
 	return 0;
 }

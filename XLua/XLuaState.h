@@ -8,7 +8,6 @@
 #include	"TaggedType.h"
 
 #include	"lua.hpp"
-#include	"lstate.h"
 
 #ifdef XLUA_LEGACY
 	#include	"LuaXLua.h"

@@ -510,7 +510,7 @@ bool CallStack::CheckPushReturn () {
 	return true;
 }
 
-extern "C" int db_errorfb (lua_State *L);
+//extern "C" int db_errorfb (lua_State *L);
 
 /**
  * LuaC_StackError is a special error handler used before invoking a Lua function in
@@ -538,8 +538,10 @@ int CallStack::LuaC_StackError (lua_State *L) {
 			if (lm->useBacktrace) {
 				// Let's be lazy about any backtrace calculations
 				if (bt.empty()) {
-					lua_pushinteger(L, 1);
-					db_errorfb(L);
+					char message[2000] = {};
+					strcpy_s(message, lua_tostring(L, 1));
+					lua_pop(L, 1);
+					luaL_traceback(L, L, message, 1);
 					
 					std::stringstream bt_build;
 					bt_build << "Event " << state->stack.EventNumber() << ": " << lua_tostring(L, 1) << "\r\n";

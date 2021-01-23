@@ -206,7 +206,7 @@ static const char *mksymname(lua_State *L, const char *modname,
   return funcname;
 }
 
-static int ll_loadfunc(lua_State *L, const char *path, const char *name, int r)
+int ll_loadfunc(lua_State *L, const char *path, const char *name, int r)
 {
   void **reg = ll_register(L, path);
   if (*reg == NULL) *reg = ll_load(L, path, (*name == '*'));
@@ -268,7 +268,7 @@ static int readable(const char *filename)
   return 1;
 }
 
-static const char *pushnexttemplate(lua_State *L, const char *path)
+const char *pushnexttemplate(lua_State *L, const char *path)
 {
   const char *l;
   while (*path == *LUA_PATHSEP) path++;  /* skip separators */
@@ -327,10 +327,20 @@ static const char *findfile(lua_State *L, const char *name,
   return searchpath(L, name, path, ".", LUA_DIRSEP);
 }
 
-static void loaderror(lua_State *L, const char *filename)
+void loaderror(lua_State *L, const char *filename)
 {
   luaL_error(L, "error loading module " LUA_QS " from file " LUA_QS ":\n\t%s",
 	     lua_tostring(L, 1), filename, lua_tostring(L, -1));
+}
+
+const char *mkfuncname (lua_State *L, const char *modname) {
+  const char *funcname;
+  const char *mark = strchr(modname, *"-");
+  if (mark) modname = mark + 1;
+  funcname = luaL_gsub(L, modname, ".", "_");
+  funcname = lua_pushfstring(L, "luaopen_%s", funcname);
+  lua_remove(L, -2);  /* remove 'gsub' result */
+  return funcname;
 }
 
 static int lj_cf_package_loader_lua(lua_State *L)

@@ -8,7 +8,6 @@
 #include	<windows.h>
 
 #include	"lua.hpp"
-#include	"lstate.h"
 
 typedef struct tagRDATA RUNDATA;
 typedef RUNDATA* LPRDATA;

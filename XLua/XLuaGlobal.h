@@ -5,7 +5,6 @@
 #include <hash_map>
 
 #include "lua.hpp"
-#include "lstate.h"
 
 // =====================================================================================
 // XLua Global State Manager
@@ -77,7 +76,7 @@ inline XLuaState* XLuaGlobal::GetState (int sid) {
 inline XLuaState* XLuaGlobal::GetStateByState (lua_State* state) {
 	XLuaState* ret = _stateLookup[state];
 	if (!ret)
-		ret = _stateLookup[state->l_G->mainthread];
+		ret = _stateLookup[state];
 	return ret;
 }
 
