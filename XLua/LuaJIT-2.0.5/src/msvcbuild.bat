@@ -90,12 +90,12 @@ buildvm -m folddef -o lj_folddef.h lj_opt_fold.c
 if exist %LJDLLNAME%.manifest^
   %LJMT% -manifest %LJDLLNAME%.manifest -outputresource:%LJDLLNAME%;2
 
-%LJCOMPILE% luajit.c
-@if errorlevel 1 goto :BAD
-%LJLINK% /out:..\bin\luajit.exe luajit.obj %LJLIBNAME%
-@if errorlevel 1 goto :BAD
-if exist luajit.exe.manifest^
-  %LJMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
+rem %LJCOMPILE% luajit.c
+rem @if errorlevel 1 goto :BAD
+rem %LJLINK% /out:..\bin\luajit.exe luajit.obj %LJLIBNAME%
+rem @if errorlevel 1 goto :BAD
+rem if exist luajit.exe.manifest^
+rem   %LJMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
 
 @del *.obj *.manifest minilua.exe buildvm.exe *.lib *.exp
 @del host\buildvm_arch.h

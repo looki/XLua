@@ -30,6 +30,8 @@
 #include <locale.h>
 #endif
 
+#include <windows.h>
+
 /* ------------------------------------------------------------------------ */
 
 #define LJLIB_MODULE_os
@@ -250,6 +252,20 @@ LJLIB_CF(os_difftime)
 {
   lua_pushnumber(L, difftime((time_t)(luaL_checknumber(L, 1)),
 			     (time_t)(luaL_optnumber(L, 2, (lua_Number)0))));
+  return 1;
+}
+
+static LARGE_INTEGER performanceFrequency = {0};
+
+LJLIB_CF(os_microclock)
+{
+  LARGE_INTEGER lt;
+  if (!performanceFrequency.QuadPart) {
+    QueryPerformanceFrequency(&performanceFrequency);
+  }
+
+  QueryPerformanceCounter(&lt);
+  lua_pushnumber(L, ((lua_Number)lt.QuadPart)/(lua_Number)performanceFrequency.QuadPart);
   return 1;
 }
 

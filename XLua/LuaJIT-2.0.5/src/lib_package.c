@@ -552,16 +552,27 @@ static const luaL_Reg package_lib[] = {
   { NULL, NULL }
 };
 
+extern int x_require_direct (lua_State *L);
+
 static const luaL_Reg package_global[] = {
   { "module",	lj_cf_package_module },
   { "require",	lj_cf_package_require },
+  { "x_requirelib", x_require_direct },
   { NULL, NULL }
 };
+
+extern int loader_XLua (lua_State *L);
+extern int loader_XC (lua_State *L);
+extern int loader_XLua_Embedded (lua_State *L);
+extern void x_updatepath (lua_State* L);
 
 static const lua_CFunction package_loaders[] =
 {
   lj_cf_package_loader_preload,
   lj_cf_package_loader_lua,
+  loader_XLua_Embedded,
+  loader_XLua,
+  loader_XC,
   lj_cf_package_loader_c,
   lj_cf_package_loader_croot,
   NULL
@@ -577,7 +588,7 @@ LUALIB_API int luaopen_package(lua_State *L)
   luaL_register(L, LUA_LOADLIBNAME, package_lib);
   lua_pushvalue(L, -1);
   lua_replace(L, LUA_ENVIRONINDEX);
-  lua_createtable(L, sizeof(package_loaders)/sizeof(package_loaders[0])-1, 0);
+  lua_createtable(L, 0, sizeof(package_loaders)/sizeof(package_loaders[0])-1);
   for (i = 0; package_loaders[i] != NULL; i++) {
     lj_lib_pushcf(L, package_loaders[i], 1);
     lua_rawseti(L, -2, i+1);
@@ -588,6 +599,7 @@ LUALIB_API int luaopen_package(lua_State *L)
   lua_pop(L, 1);
   setpath(L, "path", LUA_PATH, LUA_PATH_DEFAULT, noenv);
   setpath(L, "cpath", LUA_CPATH, LUA_CPATH_DEFAULT, noenv);
+  x_updatepath(L);
   lua_pushliteral(L, LUA_PATH_CONFIG);
   lua_setfield(L, -2, "config");
   luaL_findtable(L, LUA_REGISTRYINDEX, "_LOADED", 16);
