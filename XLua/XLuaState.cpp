@@ -1191,14 +1191,6 @@ int XLuaState::LuaC_Error (lua_State *L) {
 		return 0;
 
 	lua_pushcfunction(L, err);
-	_ASSERT(lua_gettop(L) == 2);
-
-	lua_getglobal(L, "require");
-	lua_pushstring(L, "mobdebug");
-	lua_pcall(L, 1, 1, 2);
-	lua_getfield(L, -1, "pause");
-	lua_pcall(L, 0, 0, 2);
-	lua_pop(L, 2);
 
 	std::string message = lua_tostring(L, 1);
 	std::string bt;
