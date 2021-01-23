@@ -151,13 +151,9 @@ int Object::NewObject (lua_State* L) {
 
 	lua_checkstack(L, base + 10);
 
-	uint32_t requestedFixed = lua_tointeger(L, 1);
-	uint32_t hoNum = requestedFixed & 0xFFFF;
-	LPHO obj = rh->rhObjectList[hoNum].oblOffset;
-	if (!obj)
-		return 0;
-	uint32_t fixed = (obj->hoCreationId << 16) | obj->hoNumber;
-	if (requestedFixed != fixed)
+	uint32_t fixed = lua_tointeger(L, 1);
+	LPHO obj = rh->rhObjectList[fixed & 0xFFFF].oblOffset;
+	if (!ObjectCheck(obj, rh, fixed))
 		return 0;
 
 	// Check if we cached the object
