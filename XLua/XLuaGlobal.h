@@ -78,10 +78,11 @@ inline XLuaState* XLuaGlobal::GetState (int sid) {
 inline XLuaState* XLuaGlobal::GetStateByState (lua_State* state) {
 	XLuaState* ret = _stateLookup[state];
 	if (!ret) {
-		lua_pushinteger(state, XLUA_REGISTRY_MAIN_THREAD);
-		lua_gettable(state, LUA_REGISTRYINDEX);
-		state = static_cast<lua_State*>(lua_touserdata(state, -1));
-		lua_pop(state, 1);
+		lua_State* coro_state = state;
+		lua_pushinteger(coro_state, XLUA_REGISTRY_MAIN_THREAD);
+		lua_gettable(coro_state, LUA_REGISTRYINDEX);
+		state = static_cast<lua_State*>(lua_touserdata(coro_state, -1));
+		lua_pop(coro_state, 1);
 		ret = _stateLookup[state];
 	}
 	return ret;
