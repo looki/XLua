@@ -227,7 +227,7 @@ EXPORTS
 	luaL_where				@2034
 	
 	luaopen_base			@2300
-	luaopen_bit				@2301
+;	luaopen_bit				@2301
 	luaopen_debug			@2302
 	luaopen_io				@2303
 	luaopen_jit				@2304

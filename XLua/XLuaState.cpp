@@ -210,6 +210,7 @@ void XLuaState::LoadString (const char* str, const char* sname) {
 		std::stringstream name; name << "Run String " << dsCount++;
 		chunkname = name.str();
 	}
+	chunkname.insert(0, "=");
 	int errCode = luaL_loadbuffer(state, str, sz, chunkname.c_str());
 
 	stack.PopFrame();
@@ -242,12 +243,16 @@ void XLuaState::LoadString (const char* str, const char* sname) {
 	}
 }
 
-void XLuaState::LoadEmbedded (const char* name, LPRDATA rdPtr) {
+void XLuaState::LoadEmbedded(const char* name, LPRDATA rdPtr) {
 	XLuaObject::IScripts si = rdPtr->luaMan->scripts.find(name);
 	if (si == rdPtr->luaMan->scripts.end())
 		return;
 
 	LoadString(si->second.script.c_str(), si->second.name.c_str());
+}
+
+extern "C" {
+	//LUALIB_API int luaopen_bit(lua_State* L);
 }
 
 void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
@@ -267,7 +272,7 @@ void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
 		case PACKAGE_STRING: stat = lua_cpcall(state, luaopen_string, 0); break;
 		case PACKAGE_DEBUG: stat = lua_cpcall(state, luaopen_debug, 0); break;
 		case PACKAGE_JIT: stat = lua_cpcall(state, luaopen_jit, 0); break;
-		case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
+		//case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
 #ifdef XLUA_LEGACY
 		case PACKAGE_XLUA: stat = 0; xlua.Register(); break;
 #endif
@@ -1173,6 +1178,14 @@ int XLuaState::LuaC_Print (lua_State* L) {
 
 extern "C" int db_errorfb (lua_State *L);
 
+
+static int err(lua_State* L) {
+	const char* msg = lua_tostring(L, 1);
+	puts(msg);
+	return 0;
+}
+
+
 int XLuaState::LuaC_Error (lua_State *L) {
 	XLuaState* state = XLuaGlobal::Get().GetStateByState(L);
 	if (state == NULL)
@@ -1180,6 +1193,16 @@ int XLuaState::LuaC_Error (lua_State *L) {
 
 	if (!lua_isstring(L, 1))
 		return 0;
+
+	lua_pushcfunction(L, err);
+	_ASSERT(lua_gettop(L) == 2);
+
+	lua_getglobal(L, "require");
+	lua_pushstring(L, "mobdebug");
+	lua_pcall(L, 1, 1, 2);
+	lua_getfield(L, -1, "pause");
+	lua_pcall(L, 0, 0, 2);
+	lua_pop(L, 2);
 
 	std::string message = lua_tostring(L, 1);
 	std::string bt;
