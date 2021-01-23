@@ -8,6 +8,7 @@
 #include	"stdafx.h"
 #include	"common.h"
 #include	"EditSetup.h"
+#include	"UnicodeHelpers.h"
 
 // --------------------
 // Debugger
@@ -509,11 +510,11 @@ LPWORD WINAPI DLLExport GetDebugTree(LPRDATA rdPtr)
 // -----------------
 // This routine returns the text of a given item.
 //
-void WINAPI DLLExport GetDebugItem(LPSTR pBuffer, LPRDATA rdPtr, int id)
+void WINAPI DLLExport GetDebugItem(LPTSTR pBuffer, LPRDATA rdPtr, int id)
 {
 #if !defined(RUN_ONLY)
 
-	char temp[DB_BUFFERSIZE];
+	TCHAR temp[DB_BUFFERSIZE];
 
 	switch (id)
 	{
@@ -529,33 +530,39 @@ void WINAPI DLLExport GetDebugItem(LPSTR pBuffer, LPRDATA rdPtr, int id)
 		break;
 
 	case DB_LASTERROR:
+	{
+		TempMMFString str = rdPtr->luaMan->lastErrorString.substr(0, DB_BUFFERSIZE - _tcslen(temp)).c_str();
 		LoadString(hInstLib, IDS_DB_LASTERROR, temp, DB_BUFFERSIZE);
-		wsprintf(pBuffer, temp, rdPtr->luaMan->lastErrorString.substr(0, DB_BUFFERSIZE - strlen(temp)).c_str());
+		wsprintf(pBuffer, temp, str.c_str());
 		break;
+	}
 
 	case DB_LASTPRINT:
+	{
+		TempMMFString str = rdPtr->luaMan->lastPrintString.substr(0, DB_BUFFERSIZE - _tcslen(temp)).c_str();
 		LoadString(hInstLib, IDS_DB_LASTPRINT, temp, DB_BUFFERSIZE);
-		wsprintf(pBuffer, temp, rdPtr->luaMan->lastPrintString.substr(0, DB_BUFFERSIZE - strlen(temp)).c_str());
+		wsprintf(pBuffer, temp, str.c_str());
 		break;
-
+	}
+		
 	case DB_ERRORMODE:
 		LoadString(hInstLib, IDS_DB_ERRORMODE, temp, DB_BUFFERSIZE);
 		if (rdPtr->luaMan->errMode == 0)
-			wsprintf(pBuffer, temp, "Immediate");
+			wsprintf(pBuffer, temp, _T("Immediate"));
 		else if (rdPtr->luaMan->errMode == 1)
-			wsprintf(pBuffer, temp, "Queued");
+			wsprintf(pBuffer, temp, _T("Queued"));
 		else
-			wsprintf(pBuffer, temp, "???");
+			wsprintf(pBuffer, temp, _T("???"));
 		break;
 
 	case DB_PRINTMODE:
 		LoadString(hInstLib, IDS_DB_PRINTMODE, temp, DB_BUFFERSIZE);
 		if (rdPtr->luaMan->printMode == 0)
-			wsprintf(pBuffer, temp, "Immediate");
+			wsprintf(pBuffer, temp, _T("Immediate"));
 		else if (rdPtr->luaMan->printMode == 1)
-			wsprintf(pBuffer, temp, "Queued");
+			wsprintf(pBuffer, temp, _T("Queued"));
 		else
-			wsprintf(pBuffer, temp, "???");
+			wsprintf(pBuffer, temp, _T("???"));
 		break;
 	}
 

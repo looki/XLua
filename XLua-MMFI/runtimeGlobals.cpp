@@ -178,6 +178,7 @@ int Globals::SetString (lua_State* L) {
 		return 0;
 	}
 
+	// TODO
 	unsigned slen = lua_objlen(L, 3);
 	app->m_pGlobalString[key] = (LPSTR) mvReAlloc(rh->rh4.rh4Mv, app->m_pGlobalString[key], slen + 1);
 	strncpy_s(app->m_pGlobalString[key], slen + 1, lua_tostring(L, 3), slen + 1);

@@ -95,13 +95,13 @@ HWND CreateEditControl (HWND hwndParent) {
 	MapDialogRect(hwndParent, &rc);
 
 	HWND sci;
-	sci = CreateWindowEx(WS_EX_CLIENTEDGE, "Scintilla", "", WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN,
+	sci = CreateWindowExA(WS_EX_CLIENTEDGE, "Scintilla", "", WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_CLIPCHILDREN,
 		rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, hwndParent, 0, hInstLib, 0);
 
 	if (!sci) {
 		char msg[256];
-		sprintf(msg, "Could not create the editor control: error code %x", GetLastError());
-		MessageBox(0, msg, "Editor Error", MB_OK | MB_ICONWARNING);
+		printf_s(msg, "Could not create the editor control: error code %x", GetLastError());
+		MessageBoxA(0, msg, "Editor Error", MB_OK | MB_ICONWARNING);
 	}
 
 	return sci;
@@ -358,11 +358,11 @@ void InitLists (HWND hwnd) {
 
 	// Insert names of all scripts
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
-		SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)(*it)->name.c_str());
+		SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)(*it)->name.c_str());
 	}
 
 	// Select first item, update dialog state accordingly
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_SETCURSEL, 0, 0);
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_SETCURSEL, 0, 0);
 	ScriptSelChange(hwnd);
 }
 
@@ -377,7 +377,7 @@ void ScriptSelChange (HWND hwnd) {
 	if (!ss)
 		return;
 
-	int sel = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
+	int sel = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
 	
 	// If no selection... 
 	if (sel == LB_ERR) {
@@ -398,10 +398,10 @@ void ScriptSelChange (HWND hwnd) {
 	sm.stec.SendEditor(SCI_SETREADONLY, 0);
 
 	// Find out what's selected, load the corresponding SciDoc
-	int slen = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
+	int slen = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
 	char* buf = new char[slen + 1];
 
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
 
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
 		if ((*it)->name.compare(buf) == 0) {
@@ -414,9 +414,9 @@ void ScriptSelChange (HWND hwnd) {
 
 			// Update auto-run checkbox state
 			if ((*it)->loadAtStart)
-				SendDlgItemMessage(hwnd, IDC_CHECKBOX_AUTORUN, BM_SETCHECK, BST_CHECKED, 0);
+				SendDlgItemMessageA(hwnd, IDC_CHECKBOX_AUTORUN, BM_SETCHECK, BST_CHECKED, 0);
 			else
-				SendDlgItemMessage(hwnd, IDC_CHECKBOX_AUTORUN, BM_SETCHECK, BST_UNCHECKED, 0);
+				SendDlgItemMessageA(hwnd, IDC_CHECKBOX_AUTORUN, BM_SETCHECK, BST_UNCHECKED, 0);
 
 			break;
 		}
@@ -436,15 +436,15 @@ void ScriptDelete (HWND hwnd) {
 		return;
 
 	// Is anything selected for deletion?
-	int sel = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
+	int sel = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
 	if (sel == LB_ERR)
 		return;
 	
 	// Find out what's selected, delete it
-	int slen = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
+	int slen = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
 	char* buf = new char[slen + 1];
 
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
 
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
 		if ((*it)->name.compare(buf) == 0) {
@@ -453,7 +453,7 @@ void ScriptDelete (HWND hwnd) {
 			// We just deleted our current script!
 			ss->curScript = 0;
 
-			SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_DELETESTRING, sel, 0);
+			SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_DELETESTRING, sel, 0);
 			ScriptSelChange(hwnd);
 			break;
 		}
@@ -473,14 +473,14 @@ void ScriptAdd (HWND hwnd) {
 		return;
 
 	// Make sure we actually "OK"ed the action
-	int retcode = DialogBoxParam(hInstLib, MAKEINTRESOURCE(IDD_NEW), hwnd, NameDialogProc, (LPARAM)"Add Script");
+	int retcode = DialogBoxParam(hInstLib, MAKEINTRESOURCE(IDD_NEW), hwnd, NameDialogProc, (LPARAM)_T("Add Script"));
 	if (retcode != IDOK)
 		return;
 
 	// Ferret out duplicate names
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
 		if ((*it)->name.compare(sm.tempName) == 0) {
-			MessageBox(hwnd, "A script with this name already exists.", "Duplicate Name", MB_ICONWARNING);
+			MessageBox(hwnd, _T("A script with this name already exists."), _T("Duplicate Name"), MB_ICONWARNING);
 			return;
 		}
 	}
@@ -489,7 +489,7 @@ void ScriptAdd (HWND hwnd) {
 	ss->curScript = ss->AddScript(sm.tempName);
 	ScriptSelChange(hwnd);
 
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)sm.tempName.c_str());
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)sm.tempName.c_str());
 }
 
 /**
@@ -502,16 +502,16 @@ void ScriptRename (HWND hwnd) {
 	ScriptSet* ss = sm.edPtr->tData->scripts;
 
 	// We can only rename a script if it's selected
-	int sel = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
+	int sel = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETCURSEL, 0, 0);
 	if (sel == LB_ERR)
 		return;
 
 	// Find out what's selected
 	ScriptData* sd = 0;
-	int slen = SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
+	int slen = SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXTLEN, sel, 0);
 	char* buf = new char[slen + 1];
 
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_GETTEXT, sel, (LPARAM)buf);
 
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
 		if ((*it)->name.compare(buf) == 0) {
@@ -534,7 +534,7 @@ void ScriptRename (HWND hwnd) {
 	// Ferret out duplicate names
 	for (ScriptSet::IScript it = ss->scripts.begin(); it != ss->scripts.end(); it++) {
 		if ((*it)->name.compare(sm.tempName) == 0 && (*it) != sd) {
-			MessageBox(hwnd, "A script with this name already exists.", "Duplicate Name", MB_ICONWARNING);
+			MessageBoxA(hwnd, "A script with this name already exists.", "Duplicate Name", MB_ICONWARNING);
 			return;
 		}
 	}
@@ -542,21 +542,21 @@ void ScriptRename (HWND hwnd) {
 	// Update our name
 	sd->name = sm.tempName;
 
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_DELETESTRING, sel, 0);
-	SendDlgItemMessage(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)sm.tempName.c_str());
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_DELETESTRING, sel, 0);
+	SendDlgItemMessageA(hwnd, IDC_LIST_SCRIPT, LB_ADDSTRING, 0, (LPARAM)sm.tempName.c_str());
 }
 
 void CaptureName (HWND hwnd) {
 	ScriptManager& sm = ScriptManager::Get();
 
-	int len = SendDlgItemMessage(hwnd, IDC_EDIT_NEWNAME, EM_LINELENGTH, 0, 0);
+	int len = SendDlgItemMessageA(hwnd, IDC_EDIT_NEWNAME, EM_LINELENGTH, 0, 0);
 	
 	// Setup destination buffer to accept a string from the input box.
 	char* buf = new char[len + 1];
 	((int*)buf)[0] = len + 1;
 
 	// Grab name and store it to a temporary place in the ScriptManager
-	SendDlgItemMessage(hwnd, IDC_EDIT_NEWNAME, EM_GETLINE, 0, (LPARAM)buf);
+	SendDlgItemMessageA(hwnd, IDC_EDIT_NEWNAME, EM_GETLINE, 0, (LPARAM)buf);
 	sm.tempName = buf;
 
 	delete[] buf;
@@ -932,7 +932,7 @@ int CheckboxAutorunCommand (HWND hwndDlg, WPARAM wParam, LPARAM lParam) {
 		
 		case BN_CLICKED: 
 			{
-				int state = SendDlgItemMessage(hwndDlg, IDC_CHECKBOX_AUTORUN, BM_GETCHECK, 0, 0);
+				int state = SendDlgItemMessageA(hwndDlg, IDC_CHECKBOX_AUTORUN, BM_GETCHECK, 0, 0);
 				if (state == BST_CHECKED)
 					ss->curScript->loadAtStart = true;
 				else
@@ -1041,7 +1041,7 @@ INT_PTR CALLBACK NameDialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM l
 	switch (uMsg) {
 
 	case WM_INITDIALOG:
-		SetDlgItemText(hwndDlg, IDD_NEW, (LPCSTR)lParam);
+		SetDlgItemTextA(hwndDlg, IDD_NEW, (LPCSTR)lParam);
 		return TRUE;
 
 	case WM_COMMAND:

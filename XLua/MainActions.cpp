@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "UnicodeHelpers.h"
 
 // Quick memo: content of the eventInformations arrays
 // ---------------------------------------------------
@@ -90,9 +91,11 @@ short actionsInfos[] = {
 	IDMN_ACT_PUSH_TABLE_RETURN_END,		M_ACT_PUSH_TABLE_RETURN_END,	ACT_PUSH_TABLE_RETURN_END,		0,				0,
 };
 
-// ActRunSourceFile (char* filename)
-short WINAPI DLLExport ActRunSourceFile (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+
+
+// ActRunSourceFile (TCHAR* filename)
+short WINAPI DLLExport ActRunSourceFile(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadFile(p1);
@@ -101,9 +104,9 @@ short WINAPI DLLExport ActRunSourceFile (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRunSourceString (char* source)
-short WINAPI DLLExport ActRunSourceString (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRunSourceString (TCHAR* source)
+short WINAPI DLLExport ActRunSourceString(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadString(p1);
@@ -113,7 +116,7 @@ short WINAPI DLLExport ActRunSourceString (LPRDATA rdPtr, long param1, long para
 }
 
 // ActPushIntParam (int val)
-short WINAPI DLLExport ActPushIntParam (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushIntParam(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 
 	if (rdPtr->luaMan->state) {
@@ -123,9 +126,9 @@ short WINAPI DLLExport ActPushIntParam (LPRDATA rdPtr, long param1, long param2)
 	return 0;
 }
 
-// ActPushStringParam (char* val)
-short WINAPI DLLExport ActPushStringParam (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActPushStringParam (TCHAR* val)
+short WINAPI DLLExport ActPushStringParam(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushParam(p1);
@@ -135,7 +138,7 @@ short WINAPI DLLExport ActPushStringParam (LPRDATA rdPtr, long param1, long para
 }
 
 // ActPushBoolParam (bool val)
-short WINAPI DLLExport ActPushBoolParam (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushBoolParam(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 
 	if (rdPtr->luaMan->state) {
@@ -145,9 +148,9 @@ short WINAPI DLLExport ActPushBoolParam (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActCallFunction (char* func)
-short WINAPI DLLExport ActCallFunction (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActCallFunction (TCHAR* func)
+short WINAPI DLLExport ActCallFunction(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.CallLuaFunction(p1);
@@ -157,7 +160,7 @@ short WINAPI DLLExport ActCallFunction (LPRDATA rdPtr, long param1, long param2)
 }
 
 // ActPushIntReturn (int val)
-short WINAPI DLLExport ActPushIntReturn (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushIntReturn(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 
 	if (rdPtr->luaMan->state) {
@@ -167,9 +170,9 @@ short WINAPI DLLExport ActPushIntReturn (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActPushStringReturn (char* val)
-short WINAPI DLLExport ActPushStringReturn (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActPushStringReturn (TCHAR* val)
+short WINAPI DLLExport ActPushStringReturn(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushReturn(p1);
@@ -179,7 +182,7 @@ short WINAPI DLLExport ActPushStringReturn (LPRDATA rdPtr, long param1, long par
 }
 
 // ActPushBoolReturn (bool val)
-short WINAPI DLLExport ActPushBoolReturn (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushBoolReturn(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 
 	if (rdPtr->luaMan->state) {
@@ -190,7 +193,7 @@ short WINAPI DLLExport ActPushBoolReturn (LPRDATA rdPtr, long param1, long param
 }
 
 // ActOpenAllLibs ()
-short WINAPI DLLExport ActOpenAllLibs (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenAllLibs(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_ALL);
 	}
@@ -199,7 +202,7 @@ short WINAPI DLLExport ActOpenAllLibs (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActOpenBaseLib ()
-short WINAPI DLLExport ActOpenBaseLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenBaseLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_BASE);
 	}
@@ -208,7 +211,7 @@ short WINAPI DLLExport ActOpenBaseLib (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActOpenPackageLib ()
-short WINAPI DLLExport ActOpenPackageLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenPackageLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_PACKAGE);
 	}
@@ -217,7 +220,7 @@ short WINAPI DLLExport ActOpenPackageLib (LPRDATA rdPtr, long param1, long param
 }
 
 // ActOpenTableLib ()
-short WINAPI DLLExport ActOpenTableLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenTableLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_TABLE);
 	}
@@ -226,7 +229,7 @@ short WINAPI DLLExport ActOpenTableLib (LPRDATA rdPtr, long param1, long param2)
 }
 
 // ActOpenIoLib ()
-short WINAPI DLLExport ActOpenIoLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenIoLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_IO);
 	}
@@ -235,7 +238,7 @@ short WINAPI DLLExport ActOpenIoLib (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActOpenOsLib ()
-short WINAPI DLLExport ActOpenOsLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenOsLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_OS);
 	}
@@ -244,7 +247,7 @@ short WINAPI DLLExport ActOpenOsLib (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActOpenStringLib ()
-short WINAPI DLLExport ActOpenStringLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenStringLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_STRING);
 	}
@@ -253,7 +256,7 @@ short WINAPI DLLExport ActOpenStringLib (LPRDATA rdPtr, long param1, long param2
 }
 
 // ActOpenMathLib ()
-short WINAPI DLLExport ActOpenMathLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenMathLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_MATH);
 	}
@@ -262,7 +265,7 @@ short WINAPI DLLExport ActOpenMathLib (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActOpenDebugLib ()
-short WINAPI DLLExport ActOpenDebugLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenDebugLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_DEBUG);
 	}
@@ -271,7 +274,7 @@ short WINAPI DLLExport ActOpenDebugLib (LPRDATA rdPtr, long param1, long param2)
 }
 
 // ActOpenBitLib ()
-short WINAPI DLLExport ActOpenBitLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenBitLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_BIT);
 	}
@@ -279,9 +282,9 @@ short WINAPI DLLExport ActOpenBitLib (LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActRegisterFunc (char* func, int minParams)
-short WINAPI DLLExport ActRegisterFunc (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFunc (TCHAR* func, int minParams)
+short WINAPI DLLExport ActRegisterFunc(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -291,9 +294,9 @@ short WINAPI DLLExport ActRegisterFunc (LPRDATA rdPtr, long param1, long param2)
 	return 0;
 }
 
-// ActSetIntVar (char* var, int val)
-short WINAPI DLLExport ActSetIntVar (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActSetIntVar (TCHAR* var, int val)
+short WINAPI DLLExport ActSetIntVar(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -303,10 +306,10 @@ short WINAPI DLLExport ActSetIntVar (LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActSetStringVar (char* var, char* val)
-short WINAPI DLLExport ActSetStringVar (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
-	char* p2 = (char*) param2;
+// ActSetStringVar (TCHAR* var, TCHAR* val)
+short WINAPI DLLExport ActSetStringVar(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
+	TempLuaString p2((TCHAR*)param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SetStringVariable(p1, p2);
@@ -315,9 +318,9 @@ short WINAPI DLLExport ActSetStringVar (LPRDATA rdPtr, long param1, long param2)
 	return 0;
 }
 
-// ActSetBoolVar (char* var, bool val)
-short WINAPI DLLExport ActSetBoolVar (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActSetBoolVar (TCHAR* var, bool val)
+short WINAPI DLLExport ActSetBoolVar(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -328,58 +331,58 @@ short WINAPI DLLExport ActSetBoolVar (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActExportObj (Obj object, int id)
-short WINAPI DLLExport ActExportObj (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
-	LPRO p1 = (LPRO) param1;
+short WINAPI DLLExport ActExportObj(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
+	LPRO p1 = (LPRO)param1;
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ExportObject(p2, p1);
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActSetLocalVal (int id, int val)
-short WINAPI DLLExport ActSetLocalVal (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
-	long  p1 = (long) CNC_GetParameter(rdPtr);
-	long  t2 = (long) CNC_GetParameter(rdPtr);
+short WINAPI DLLExport ActSetLocalVal(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
+	long  p1 = (long)CNC_GetParameter(rdPtr);
+	long  t2 = (long)CNC_GetParameter(rdPtr);
 
-	float p2 = *(float*) &t2;
+	float p2 = *(float*)&t2;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SetLocalValue(p1, p2);
 	}
-#endif
+	#endif
 	return 0;
 }
 
-// ActSetLocalStr (int id, char* val)
-short WINAPI DLLExport ActSetLocalStr (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+// ActSetLocalStr (int id, TCHAR* val)
+short WINAPI DLLExport ActSetLocalStr(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	int p1 = param1;
-	char* p2 = (char*) param2;
+	TempLuaString p2((TCHAR*)param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SetLocalString(p1, p2);
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActEnableMMFI ()
-short WINAPI DLLExport ActEnableMMFI (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActEnableMMFI(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->mmfi.Register();
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActEnableJit ()
-short WINAPI DLLExport ActEnableJit (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActEnableJit(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->EnableJIT();
 	}
@@ -388,7 +391,7 @@ short WINAPI DLLExport ActEnableJit (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActOpenJitLib ()
-short WINAPI DLLExport ActOpenJitLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenJitLib(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_JIT);
 	}
@@ -397,52 +400,52 @@ short WINAPI DLLExport ActOpenJitLib (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActEnableWINI ()
-short WINAPI DLLExport ActEnableWINI (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActEnableWINI(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->mmfi.RegisterWin();
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActResetState ()
-short WINAPI DLLExport ActResetState (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActResetState(LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
 // ActResetLocalStore ()
-short WINAPI DLLExport ActResetLocalStore (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActResetLocalStore(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ResetLocalStorage();
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActResetMMFI ()
-short WINAPI DLLExport ActResetMMFI (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActResetMMFI(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ResetObjectExports();
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActResetWINI ()
-short WINAPI DLLExport ActResetWINI (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActResetWINI(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ResetWinExports();
 	}
-#endif
+	#endif
 	return 0;
 }
 
 // ActCreateState (int id)
-short WINAPI DLLExport ActCreateState (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActCreateState(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 	XLuaGlobal::Get().CreateState(p1);
 
@@ -450,7 +453,7 @@ short WINAPI DLLExport ActCreateState (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActDestroyState (int id)
-short WINAPI DLLExport ActDestroyState (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActDestroyState(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 	XLuaGlobal::Get().DeleteState(p1);
 
@@ -458,7 +461,7 @@ short WINAPI DLLExport ActDestroyState (LPRDATA rdPtr, long param1, long param2)
 }
 
 // ActBindState (int id)
-short WINAPI DLLExport ActBindState (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActBindState(LPRDATA rdPtr, long param1, long param2) {
 	int p1 = param1;
 	rdPtr->luaMan->BindState(p1);
 
@@ -466,15 +469,15 @@ short WINAPI DLLExport ActBindState (LPRDATA rdPtr, long param1, long param2) {
 }
 
 // ActUnbindState ()
-short WINAPI DLLExport ActUnbindState (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActUnbindState(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->UnbindState();
 
 	return 0;
 }
 
-// ActInvokeMmfFunc (char* func)
-short WINAPI DLLExport ActInvokeMmfFunc (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActInvokeMmfFunc (TCHAR* func)
+short WINAPI DLLExport ActInvokeMmfFunc(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.CallMMFFunctionFromMMF(p1);
@@ -484,10 +487,10 @@ short WINAPI DLLExport ActInvokeMmfFunc (LPRDATA rdPtr, long param1, long param2
 }
 
 // ActPushFloatParam (float val)
-short WINAPI DLLExport ActPushFloatParam (LPRDATA rdPtr, long param1, long param2) {
-	long  t1 = (long) CNC_GetParameter(rdPtr);
+short WINAPI DLLExport ActPushFloatParam(LPRDATA rdPtr, long param1, long param2) {
+	long  t1 = (long)CNC_GetParameter(rdPtr);
 
-	float p1 = *(float*) &t1;
+	float p1 = *(float*)&t1;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushParam(p1);
@@ -497,10 +500,10 @@ short WINAPI DLLExport ActPushFloatParam (LPRDATA rdPtr, long param1, long param
 }
 
 // ActPushFloatReturn (float val)
-short WINAPI DLLExport ActPushFloatReturn (LPRDATA rdPtr, long param1, long param2) {
-	long  t1 = (long) CNC_GetParameter(rdPtr);
+short WINAPI DLLExport ActPushFloatReturn(LPRDATA rdPtr, long param1, long param2) {
+	long  t1 = (long)CNC_GetParameter(rdPtr);
 
-	float p1 = *(float*) &t1;
+	float p1 = *(float*)&t1;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushReturn(p1);
@@ -510,7 +513,7 @@ short WINAPI DLLExport ActPushFloatReturn (LPRDATA rdPtr, long param1, long para
 }
 
 // ActPushNilParam ()
-short WINAPI DLLExport ActPushNilParam (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushNilParam(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushParam();
 	}
@@ -519,7 +522,7 @@ short WINAPI DLLExport ActPushNilParam (LPRDATA rdPtr, long param1, long param2)
 }
 
 // ActPushNilReturn ()
-short WINAPI DLLExport ActPushNilReturn (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushNilReturn(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.PushReturn();
 	}
@@ -528,19 +531,19 @@ short WINAPI DLLExport ActPushNilReturn (LPRDATA rdPtr, long param1, long param2
 }
 
 // ActBindOpengl ()
-short WINAPI DLLExport ActBindOpengl (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActBindOpengl(LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
 // ActOpenGlLib ()
-short WINAPI DLLExport ActOpenGlLib (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActOpenGlLib(LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActOpenCLib (char* path, char* packagename)
-short WINAPI DLLExport ActOpenCLib (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
-	char* p2 = (char*) param2;
+// ActOpenCLib (TCHAR* path, TCHAR* packagename)
+short WINAPI DLLExport ActOpenCLib(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
+	TempLuaString p2((TCHAR*)param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadCModule(p1, p2);
@@ -549,12 +552,12 @@ short WINAPI DLLExport ActOpenCLib (LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActSetFloatVar (char* var, float val)
-short WINAPI DLLExport ActSetFloatVar (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) CNC_GetParameter(rdPtr);
-	long  t2 = (long) CNC_GetParameter(rdPtr);
+// ActSetFloatVar (TCHAR* var, float val)
+short WINAPI DLLExport ActSetFloatVar(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)CNC_GetParameter(rdPtr));
+	long  t2 = (long)CNC_GetParameter(rdPtr);
 
-	float p2 = *(float*) &t2;
+	float p2 = *(float*)&t2;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SetFloatingVariable(p1, p2);
@@ -564,20 +567,20 @@ short WINAPI DLLExport ActSetFloatVar (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActClearExportObj (int id)
-short WINAPI DLLExport ActClearExportObj (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActClearExportObj(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	int p1 = param1;
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ClearExport(p1);
 	}
-#endif
+	#endif
 	return 0;
 }
 
-// ActDeleteVar (char* var)
-short WINAPI DLLExport ActDeleteVar (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActDeleteVar (TCHAR* var)
+short WINAPI DLLExport ActDeleteVar(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SetNilVariable(p1);
@@ -586,10 +589,10 @@ short WINAPI DLLExport ActDeleteVar (LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActCallFuncInline1 (char* func, char* v1)
-short WINAPI DLLExport ActCallFucnInline1 (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
-	char* p2 = (char*) param2;
+// ActCallFuncInline1 (TCHAR* func, TCHAR* v1)
+short WINAPI DLLExport ActCallFucnInline1(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
+	TempLuaString p2((TCHAR*)param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.ClearLFParameters();
@@ -600,11 +603,11 @@ short WINAPI DLLExport ActCallFucnInline1 (LPRDATA rdPtr, long param1, long para
 	return 0;
 }
 
-// ActCallFuncInline2 (char* func, char* v1, char* v2)
-short WINAPI DLLExport ActCallFucnInline2 (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) CNC_GetParameter(rdPtr);
-	char* p2 = (char*) CNC_GetParameter(rdPtr);
-	char* p3 = (char*) CNC_GetParameter(rdPtr);
+// ActCallFuncInline2 (TCHAR* func, TCHAR* v1, TCHAR* v2)
+short WINAPI DLLExport ActCallFucnInline2(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p2((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p3((TCHAR*)CNC_GetParameter(rdPtr));
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.ClearLFParameters();
@@ -616,12 +619,12 @@ short WINAPI DLLExport ActCallFucnInline2 (LPRDATA rdPtr, long param1, long para
 	return 0;
 }
 
-// ActCallFuncInline3 (char* func, char* v1, char* v2, char* v3)
-short WINAPI DLLExport ActCallFucnInline3 (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) CNC_GetParameter(rdPtr);
-	char* p2 = (char*) CNC_GetParameter(rdPtr);
-	char* p3 = (char*) CNC_GetParameter(rdPtr);
-	char* p4 = (char*) CNC_GetParameter(rdPtr);
+// ActCallFuncInline3 (TCHAR* func, TCHAR* v1, TCHAR* v2, TCHAR* v3)
+short WINAPI DLLExport ActCallFucnInline3(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p2((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p3((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p4((TCHAR*)CNC_GetParameter(rdPtr));
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.ClearLFParameters();
@@ -634,13 +637,13 @@ short WINAPI DLLExport ActCallFucnInline3 (LPRDATA rdPtr, long param1, long para
 	return 0;
 }
 
-// ActCallFuncInline4 (char* func, char* v1, char* v2, char* v3, char* v4)
-short WINAPI DLLExport ActCallFucnInline4 (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) CNC_GetParameter(rdPtr);
-	char* p2 = (char*) CNC_GetParameter(rdPtr);
-	char* p3 = (char*) CNC_GetParameter(rdPtr);
-	char* p4 = (char*) CNC_GetParameter(rdPtr);
-	char* p5 = (char*) CNC_GetParameter(rdPtr);
+// ActCallFuncInline4 (TCHAR* func, TCHAR* v1, TCHAR* v2, TCHAR* v3, TCHAR* v4)
+short WINAPI DLLExport ActCallFucnInline4(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p2((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p3((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p4((TCHAR*)CNC_GetParameter(rdPtr));
+	TempLuaString p5((TCHAR*)CNC_GetParameter(rdPtr));
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.ClearLFParameters();
@@ -654,20 +657,20 @@ short WINAPI DLLExport ActCallFucnInline4 (LPRDATA rdPtr, long param1, long para
 	return 0;
 }
 
-// ActCallFuncInlineDelim (char* func, char* v1)
-short WINAPI DLLExport ActCallFucnInlineDelim (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
-	char* p2 = (char*) param2;
+// ActCallFuncInlineDelim (TCHAR* func, TCHAR* v1)
+short WINAPI DLLExport ActCallFucnInlineDelim(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
+	TempLuaString p2((TCHAR*)param2);
 
 	if (!rdPtr->luaMan->state) {
 		return 0;
 	}
 
 	rdPtr->luaMan->state->stack.ClearLFParameters();
-	std::string str(p2);
+	std::string str = p2;
 
 	int nidx, pidx = 0;
-	
+
 	do {
 		nidx = str.find_first_of("|", pidx);
 		rdPtr->luaMan->state->stack.PushParam(str.substr(pidx, nidx - pidx).c_str());
@@ -680,32 +683,32 @@ short WINAPI DLLExport ActCallFucnInlineDelim (LPRDATA rdPtr, long param1, long 
 }
 
 // ActSetErrModeI ()
-short WINAPI DLLExport ActSetErrModeI (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActSetErrModeI(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->errMode = 0;
 	return 0;
 }
 
 // ActSetErrModeQ ()
-short WINAPI DLLExport ActSetErrModeQ (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActSetErrModeQ(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->errMode = 1;
 	return 0;
 }
 
 // ActSetPrintModeI ()
-short WINAPI DLLExport ActSetPrintModeI (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActSetPrintModeI(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->printMode = 0;
 	return 0;
 }
 
 // ActSetPrintModeQ ()
-short WINAPI DLLExport ActSetPrintModeQ (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActSetPrintModeQ(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->printMode = 1;
 	return 0;
 }
 
-// ActCaptureSelList (char* destVar)
-short WINAPI DLLExport ActCaptureSelList (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActCaptureSelList (TCHAR* destVar)
+short WINAPI DLLExport ActCaptureSelList(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SaveObjectSelection(p1);
@@ -714,15 +717,15 @@ short WINAPI DLLExport ActCaptureSelList (LPRDATA rdPtr, long param1, long param
 	return 0;
 }
 
-// ActCaptureSelObject (Obj object, char* destVar)
-short WINAPI DLLExport ActCaptureSelObject (LPRDATA rdPtr, long param1, long param2) {
+// ActCaptureSelObject (Obj object, TCHAR* destVar)
+short WINAPI DLLExport ActCaptureSelObject(LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
-// ActRunNamedSourceStr (char* source, char* name)
-short WINAPI DLLExport ActRunNamedSourceStr (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
-	char* p2 = (char*) param2;
+// ActRunNamedSourceStr (TCHAR* source, TCHAR* name)
+short WINAPI DLLExport ActRunNamedSourceStr(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
+	TempLuaString p2((TCHAR*)param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadString(p1, p2);
@@ -732,20 +735,20 @@ short WINAPI DLLExport ActRunNamedSourceStr (LPRDATA rdPtr, long param1, long pa
 }
 
 // ActEnableBacktrace ()
-short WINAPI DLLExport ActEnableBacktrace (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActEnableBacktrace(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->useBacktrace = true;
 	return 0;
 }
 
 // ActDisableBacktrace ()
-short WINAPI DLLExport ActDisableBacktrace (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActDisableBacktrace(LPRDATA rdPtr, long param1, long param2) {
 	rdPtr->luaMan->useBacktrace = false;
 	return 0;
 }
 
-// ActRegisterFuncA (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncA (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncA (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncA(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -755,9 +758,9 @@ short WINAPI DLLExport ActRegisterFuncA (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncB (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncB (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncB (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncB(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -767,9 +770,9 @@ short WINAPI DLLExport ActRegisterFuncB (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncC (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncC (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncC (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncC(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -779,9 +782,9 @@ short WINAPI DLLExport ActRegisterFuncC (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncD (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncD (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncD (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncD(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -791,9 +794,9 @@ short WINAPI DLLExport ActRegisterFuncD (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncE (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncE (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncE (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncE(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -803,9 +806,9 @@ short WINAPI DLLExport ActRegisterFuncE (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncF (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncF (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncF (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncF(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -815,9 +818,9 @@ short WINAPI DLLExport ActRegisterFuncF (LPRDATA rdPtr, long param1, long param2
 	return 0;
 }
 
-// ActRegisterFuncG (char* func, int minparams)
-short WINAPI DLLExport ActRegisterFuncG (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRegisterFuncG (TCHAR* func, int minparams)
+short WINAPI DLLExport ActRegisterFuncG(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 	int p2 = param2;
 
 	if (rdPtr->luaMan->state) {
@@ -828,8 +831,8 @@ short WINAPI DLLExport ActRegisterFuncG (LPRDATA rdPtr, long param1, long param2
 }
 
 // ActExportObjFixed (int objid, int id)
-short WINAPI DLLExport ActExportObjFixed (LPRDATA rdPtr, long param1, long param2) {
-#ifdef XLUA_LEGACY
+short WINAPI DLLExport ActExportObjFixed(LPRDATA rdPtr, long param1, long param2) {
+	#ifdef XLUA_LEGACY
 	int p1 = param1;
 	int p2 = param2;
 
@@ -837,13 +840,13 @@ short WINAPI DLLExport ActExportObjFixed (LPRDATA rdPtr, long param1, long param
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->ExportObjectByFixed(p2, p1, rdPtr);
 	}
-#endif
+	#endif
 	return 0;
 }
 
-// ActRunEmbedded (char* name)
-short WINAPI DLLExport ActRunEmbedded (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+// ActRunEmbedded (TCHAR* name)
+short WINAPI DLLExport ActRunEmbedded(LPRDATA rdPtr, long param1, long param2) {
+	TempLuaString p1((TCHAR*)param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->LoadEmbedded(p1, rdPtr);
@@ -853,7 +856,7 @@ short WINAPI DLLExport ActRunEmbedded (LPRDATA rdPtr, long param1, long param2) 
 }
 
 // ActPushTableParamStart ()
-short WINAPI DLLExport ActPushTableParamStart (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushTableParamStart(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.StartParamTable();
 	}
@@ -862,7 +865,7 @@ short WINAPI DLLExport ActPushTableParamStart (LPRDATA rdPtr, long param1, long 
 }
 
 // ActPushTableParamEnd ()
-short WINAPI DLLExport ActPushTableParamEnd (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushTableParamEnd(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.EndParamTable();
 	}
@@ -871,7 +874,7 @@ short WINAPI DLLExport ActPushTableParamEnd (LPRDATA rdPtr, long param1, long pa
 }
 
 // ActPushTableReturnStart ()
-short WINAPI DLLExport ActPushTableReturnStart (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushTableReturnStart(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.StartReturnTable();
 	}
@@ -880,7 +883,7 @@ short WINAPI DLLExport ActPushTableReturnStart (LPRDATA rdPtr, long param1, long
 }
 
 // ActPushTableReturnEnd ()
-short WINAPI DLLExport ActPushTableReturnEnd (LPRDATA rdPtr, long param1, long param2) {
+short WINAPI DLLExport ActPushTableReturnEnd(LPRDATA rdPtr, long param1, long param2) {
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->stack.EndReturnTable();
 	}
@@ -896,7 +899,7 @@ short WINAPI DLLExport ActPushTableReturnEnd (LPRDATA rdPtr, long param1, long p
 // Located at the end of the source for convinience
 // Must finish with a 0
 //
-short (WINAPI * ActionJumps[])(LPRDATA rdPtr, long param1, long param2) = {
+short (WINAPI* ActionJumps[])(LPRDATA rdPtr, long param1, long param2) = {
 	ActRunSourceFile,
 	ActRunSourceString,
 	ActPushIntParam,

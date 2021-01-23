@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "UnicodeHelpers.h"
 
 // Quick memo: content of the eventInformations arrays
 // ---------------------------------------------------
@@ -35,16 +36,16 @@ long WINAPI DLLExport CondOnError (LPRDATA rdPtr, long param1, long param2) {
 	return true;
 }
 
-// CondOnFunction (char* funcName)
+// CondOnFunction (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunction (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
@@ -84,10 +85,10 @@ long WINAPI DLLExport CondBoundXLuaState (LPRDATA rdPtr, long param1, long param
 	return false;
 }
 
-// CondCaptureSelObject (Obj objType, char* destVar)
+// CondCaptureSelObject (Obj objType, TCHAR* destVar)
 long WINAPI DLLExport CondCaptureSelObject (LPRDATA rdPtr, long param1, long param2) {
 	eventParam* p1 = (eventParam*) param1;
-	char* p2 = (char*) param2;
+	TempLuaString p2((TCHAR*) param2);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SaveObjectSelectionType(p1, p2);
@@ -96,9 +97,9 @@ long WINAPI DLLExport CondCaptureSelObject (LPRDATA rdPtr, long param1, long par
 	return true;
 }
 
-// CondCaptureSelList (char* destVar)
+// CondCaptureSelList (TCHAR* destVar)
 long WINAPI DLLExport CondCaptureSelList (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->SaveObjectSelection(p1);
@@ -107,9 +108,9 @@ long WINAPI DLLExport CondCaptureSelList (LPRDATA rdPtr, long param1, long param
 	return true;
 }
 
-// CondRestoreSelList (char* destVar)
+// CondRestoreSelList (TCHAR* destVar)
 long WINAPI DLLExport CondRestoreSelList (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->state) {
 		rdPtr->luaMan->state->RestoreObjectSelection(p1);
@@ -118,112 +119,112 @@ long WINAPI DLLExport CondRestoreSelList (LPRDATA rdPtr, long param1, long param
 	return true;
 }
 
-// CondOnFunctionA (char* funcName)
+// CondOnFunctionA (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionA (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_A);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionB (char* funcName)
+// CondOnFunctionB (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionB (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_B);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionC (char* funcName)
+// CondOnFunctionC (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionC (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_C);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionD (char* funcName)
+// CondOnFunctionD (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionD (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_D);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionE (char* funcName)
+// CondOnFunctionE (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionE (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_E);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionF (char* funcName)
+// CondOnFunctionF (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionF (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_F);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 
 	return false;
 }
 
-// CondOnFunctionG (char* funcName)
+// CondOnFunctionG (TCHAR* funcName)
 long WINAPI DLLExport CondOnFunctionG (LPRDATA rdPtr, long param1, long param2) {
-	char* p1 = (char*) param1;
+	TempLuaString p1((TCHAR*) param1);
 
 	if (rdPtr->luaMan->autoReg) {
 		rdPtr->luaMan->state->RegisterFunction(p1, 0, MF_FUNCTION_GROUP_G);
 		return false;
 	}
 
-	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1) == 0) {
+	if (rdPtr->luaMan->state && rdPtr->luaMan->state->stack.GetFunction().compare(p1.c_str()) == 0) {
 		return true;
 	}
 

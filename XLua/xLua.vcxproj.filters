@@ -413,6 +413,9 @@
     <ClInclude Include="..\..\vendor\SDK\current\Inc\WinMacro.h">
       <Filter>MMF Headers</Filter>
     </ClInclude>
+    <ClInclude Include="UnicodeHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Ext.def">

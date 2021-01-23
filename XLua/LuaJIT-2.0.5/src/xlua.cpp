@@ -126,7 +126,7 @@ const char* x_findfile (lua_State* L, const char* name, const char* pname) {
 		lua_remove(L, -2);  /* remove path template */
 
 		DWORD dwsz;
-		HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFile(filename, &dwsz, 0);
+		HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFileA(filename, &dwsz, 0);
 		if (hFile != INVALID_HANDLE_VALUE) {
 			rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvCloseHFile(hFile);
 			return filename;
@@ -152,7 +152,7 @@ extern "C" int loader_XLua (lua_State *L) {
 	//LuaInternalFile lif;
 	DWORD dwsz;
 	LPRDATA rdPtr = XLuaGlobal::Get().GetStateByState(L)->rdList.front()->rdPtr;
-	HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFile(filename, &dwsz, 0);
+	HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFileA(filename, &dwsz, 0);
 
 	if (hFile == INVALID_HANDLE_VALUE) {
 		loaderror(L, filename);
@@ -189,7 +189,7 @@ extern "C" int loader_XC (lua_State *L) {
 	char* tpath = (char*) calloc(_MAX_PATH, sizeof(char));
 
 	LPRDATA rdPtr = XLuaGlobal::Get().GetStateByState(L)->rdList.front()->rdPtr;
-	rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvGetFile(filename, tpath, 0);
+	rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvGetFileA(filename, tpath, 0);
 
 	funcname = mkfuncname(L, name);
 	if (ll_loadfunc(L, tpath, funcname) != 0) {
@@ -213,7 +213,7 @@ extern "C" int loader_XCDirect (lua_State *L, const char* filename, const char* 
 
 	// Check existance of module
 	LPRDATA rdPtr = XLuaGlobal::Get().GetStateByState(L)->rdList.front()->rdPtr;
-	HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFile(filename, &dwsz, 0);
+	HANDLE hFile = rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvOpenHFileA(filename, &dwsz, 0);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return 1;
 	}
@@ -221,7 +221,7 @@ extern "C" int loader_XCDirect (lua_State *L, const char* filename, const char* 
 
 	// Extract + Load module
 	char* tpath = (char*) calloc(_MAX_PATH, sizeof(char));
-	rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvGetFile(filename, tpath, 0);
+	rdPtr->rHo.hoAdRunHeader->rh4.rh4Mv->mvGetFileA(filename, tpath, 0);
 
 	funcname = mkfuncname(L, name);
 	if (ll_loadfunc(L, tpath, funcname) != 0) {
