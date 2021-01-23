@@ -4,21 +4,20 @@
 @rem (contributed by David Manura and Mike Pall)
 
 @setlocal
-@set MYCOMPILE=cl /nologo /MT /O2 /W3 /c /D_CRT_SECURE_NO_DEPRECATE /I . /I ..\dynasm
-@set MYLINK=link /nologo
-@set MYMT=mt /nologo
+@set SOURCES=..\src\l*.c ..\src\bit.c
+@set OBJECTS=l*.obj bit.obj
+@set MYCOMPILE=cl /nologo /MT /W3 /c /D_CRT_SECURE_NO_DEPRECATE /I . /I ..\dynasm
+@set MYCOMPILE_RELEASE=%MYCOMPILE% /O2
+@set MYCOMPILE_DEBUG=%MYCOMPILE% /DEBUG:FULL /Z7
 
 cd bin
-%MYCOMPILE% ..\src\l*.c ..\src\bit.c
+%MYCOMPILE_RELEASE% %SOURCES%
 del lua.obj luac.obj
-lib /nologo /nodefaultlib /out:lua51.lib l*.obj bit.obj
-rem %MYLINK% /DLL /out:lua51.dll l*.obj
-rem if exist lua51.dll.manifest^
-rem   %MYMT% -manifest lua51.dll.manifest -outputresource:lua51.dll;2
-rem %MYCOMPILE% /DLUA_BUILD_AS_DLL lua.c
-rem %MYLINK% /out:luajit.exe lua.obj lua51.lib
-rem if exist luajit.exe.manifest^
-rem   %MYMT% -manifest luajit.exe.manifest -outputresource:luajit.exe
+lib /nologo /nodefaultlib /out:lua51.lib %OBJECTS%
+del *.obj *.manifest
+
+%MYCOMPILE_DEBUG% %SOURCES%
+del lua.obj luac.obj
+lib /nologo /nodefaultlib /out:lua51d.lib %OBJECTS%
 del *.obj *.manifest
 cd ..
-
