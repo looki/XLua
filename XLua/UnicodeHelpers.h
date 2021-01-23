@@ -24,7 +24,7 @@ public:
 
 #else
 
-	TempLuaString(const char* source) : str(source) {}
+	TempLuaString(char* source) : str(source) {}
 
 #endif
 
@@ -47,7 +47,7 @@ private:
 
 // Takes a string from a Lua source (interpreted as UTF8) and converts it to UTF16 so MMF can process it.
 // Supports MMF's internal allocation function for string expression output.
-// (Does nothing in Non-Unicode builds)
+// (Does nothing in Non-Unicode builds besides allowing MMF allocation)
 
 class TempMMFString {
 public:
@@ -72,8 +72,8 @@ public:
 
 	#else
 
-	TempMMFString(const char* source) : str(source) {}
-	TempMMFString(LPRDATA rdPtr, const std::string& source) : str(source) {
+	TempMMFString(const char* source) : str(const_cast<char*>(source)) {}
+	TempMMFString(LPRDATA rdPtr, const std::string& source) : mmfAllocated(true) {
 		str = (char*)callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, source.size() + 1);
 		memcpy(str, source.c_str(), source.size() + 1);
 	}
