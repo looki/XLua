@@ -274,6 +274,7 @@ void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
 		case PACKAGE_STRING: stat = lua_cpcall(state, luaopen_string, 0); break;
 		case PACKAGE_DEBUG: stat = lua_cpcall(state, luaopen_debug, 0); break;
 		case PACKAGE_JIT: stat = lua_cpcall(state, luaopen_jit, 0); break;
+		case PACKAGE_FFI: stat = lua_cpcall(state, luaopen_ffi, 0); break;
 		case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
 #ifdef XLUA_LEGACY
 		case PACKAGE_XLUA: stat = 0; xlua.Register(); break;
