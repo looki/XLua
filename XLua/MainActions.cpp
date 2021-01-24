@@ -88,6 +88,7 @@ short actionsInfos[] = {
 	IDMN_ACT_PUSH_TABLE_PARAM_END,		M_ACT_PUSH_TABLE_PARAM_END,		ACT_PUSH_TABLE_PARAM_END,		0,				0,
 	IDMN_ACT_PUSH_TABLE_RETURN_BEGIN,	M_ACT_PUSH_TABLE_RETURN_BEGIN,	ACT_PUSH_TABLE_RETURN_BEGIN,	0,				0,
 	IDMN_ACT_PUSH_TABLE_RETURN_END,		M_ACT_PUSH_TABLE_RETURN_END,	ACT_PUSH_TABLE_RETURN_END,		0,				0,
+	IDMN_ACT_OPEN_LIBS_FFI,				M_ACT_OPEN_LIBS_FFI,			ACT_OPEN_LIBS_FFI,				0,				0,
 };
 
 // ActRunSourceFile (char* filename)
@@ -396,6 +397,14 @@ short WINAPI DLLExport ActOpenJitLib (LPRDATA rdPtr, long param1, long param2) {
 	return 0;
 }
 
+// ActOpenJitLib ()
+short WINAPI DLLExport ActOpenFFILib(LPRDATA rdPtr, long param1, long param2) {
+	if (rdPtr->luaMan->state) {
+		rdPtr->luaMan->state->LoadDefaultLib(XLuaState::PACKAGE_FFI);
+	}
+
+	return 0;
+}
 // ActEnableWINI ()
 short WINAPI DLLExport ActEnableWINI (LPRDATA rdPtr, long param1, long param2) {
 #ifdef XLUA_LEGACY
@@ -973,5 +982,6 @@ short (WINAPI * ActionJumps[])(LPRDATA rdPtr, long param1, long param2) = {
 	ActPushTableParamEnd,
 	ActPushTableReturnStart,
 	ActPushTableReturnEnd,
+	ActOpenFFILib,
 	0
 };
