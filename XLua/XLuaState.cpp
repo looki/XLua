@@ -631,7 +631,7 @@ void XLuaState::RestoreObjectSelection (const char* loc) {
 	}
 
 	int sp = lua_gettop(state);
-	stdext::hash_map<short, short> oiMap;
+	std::unordered_map<short, short> oiMap;
 
 	lua_pushnil(state);  /* first key */
 	while (lua_next(state, sp)) {

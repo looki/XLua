@@ -2,7 +2,7 @@
 #define XLUA_GLOBAL_H_
 
 #include <list>
-#include <hash_map>
+#include <unordered_map>
 
 #include "lua.hpp"
 
@@ -23,11 +23,11 @@ class XLuaGlobal {
 public:
 
 	// Lookup tables
-	stdext::hash_map<int, XLuaState*>			_stateTable;
-	stdext::hash_map<lua_State*, XLuaState*>	_stateLookup;
+	std::unordered_map<int, XLuaState*>			_stateTable;
+	std::unordered_map<lua_State*, XLuaState*>	_stateLookup;
 
 	// Reverse lookup table
-	stdext::hash_map<XLuaState*, int>			_idLookup;
+	std::unordered_map<XLuaState*, int>			_idLookup;
 
 #ifdef XLUA_LEGACY
 	// List of XLuaStates with active WIN interfaces
@@ -36,8 +36,8 @@ public:
 	typedef std::list<XLuaState*>::iterator		IWiniState;
 #endif
 
-	typedef	stdext::hash_map<int, XLuaState*>::iterator	IStateMap;
-	typedef stdext::hash_map<XLuaState*, int>::iterator	IIdMap;
+	typedef	std::unordered_map<int, XLuaState*>::iterator	IStateMap;
+	typedef std::unordered_map<XLuaState*, int>::iterator	IIdMap;
 	
 
 public:
