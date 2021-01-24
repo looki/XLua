@@ -1,8 +1,16 @@
 #include "runtime.h"
 
+#define FORCE_UNICODE_HELPERS
+#include "../XLua/UnicodeHelpers.h"
+
 // All lookup functions for values require subtables.  Create and
 // memoize corresponding lookup tables so we only pay the metatable
 // price once
+
+inline bool IsUnicode(LPRH rh) {
+	static bool unicode = rh->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
+	return unicode;
+}
 
 int Globals::GlobalsIndex (lua_State* L) {
 	LPRH rh = (LPRH)lua_touserdata(L, lua_upvalueindex(UV_STATIC_RH));
@@ -123,6 +131,10 @@ int Globals::String (lua_State* L) {
 	if (app->m_pGlobalString[key] == NULL) {
 		lua_pushstring(L, "");
 	}
+	else if (IsUnicode(rh)) {
+		TempLuaString str((wchar_t*)app->m_pGlobalString[key]);
+		lua_pushstring(L, str.c_str());
+	}
 	else {
 		lua_pushstring(L, app->m_pGlobalString[key]);
 	}
@@ -178,10 +190,18 @@ int Globals::SetString (lua_State* L) {
 		return 0;
 	}
 
-	// TODO
-	unsigned slen = lua_objlen(L, 3);
-	app->m_pGlobalString[key] = (LPSTR) mvReAlloc(rh->rh4.rh4Mv, app->m_pGlobalString[key], slen + 1);
-	strncpy_s(app->m_pGlobalString[key], slen + 1, lua_tostring(L, 3), slen + 1);
+	if (IsUnicode(rh)) {
+		TempMMFString str(lua_tostring(L, 3));
+		unsigned slen = wcslen(str.c_str());
+
+		app->m_pGlobalString[key] = (LPSTR)mvReAlloc(rh->rh4.rh4Mv, app->m_pGlobalString[key], (slen + 1) * sizeof(wchar_t));
+		wcsncpy_s((wchar_t*)app->m_pGlobalString[key], slen + 1, str.c_str(), slen + 1);
+	}
+	else{
+		unsigned slen = lua_objlen(L, 3);
+		app->m_pGlobalString[key] = (LPSTR)mvReAlloc(rh->rh4.rh4Mv, app->m_pGlobalString[key], slen + 1);
+		strncpy_s(app->m_pGlobalString[key], slen + 1, lua_tostring(L, 3), slen + 1);
+	}
 
 	return 0;
 }
@@ -200,13 +220,27 @@ int Globals::ValueKeyLookup (lua_State* L) {
 	LPRH rh = (LPRH)lua_touserdata(L, lua_upvalueindex(UV_STATIC_RH));
 
 	int* vnameCount = (int*)rh->rhApp->m_pGlobalValueNames;
-	char* vname = (char*)vnameCount + 4;
 
-	for (int i = 0; i < *vnameCount; i++) {
-		if (strcmp(key, vname) == 0)
-			return i;
+	if (IsUnicode(rh)) {
+		TempMMFString wideKey(key);
+		wchar_t* vname = (wchar_t*)((char*)vnameCount + 4);
 
-		vname += strlen(vname) + 1;
+		for (int i = 0; i < *vnameCount; i++) {
+			if (wcscmp(wideKey.c_str(), vname) == 0)
+				return i;
+
+			vname += wcslen(vname) + 1;
+		}
+	}
+	else {
+		char* vname = (char*)vnameCount + 4;
+
+		for (int i = 0; i < *vnameCount; i++) {
+			if (strcmp(key, vname) == 0)
+				return i;
+
+			vname += strlen(vname) + 1;
+		}
 	}
 
 	return -1;
@@ -224,13 +258,26 @@ int Globals::StringKeyLookup (lua_State* L) {
 	LPRH rh = (LPRH)lua_touserdata(L, lua_upvalueindex(UV_STATIC_RH));
 
 	int* vnameCount = (int*)rh->rhApp->m_pGlobalStringNames;
-	char* vname = (char*)vnameCount + 4;
+	if (IsUnicode(rh)) {
+		TempMMFString wideKey(key);
+		wchar_t* vname = (wchar_t*)((char*)vnameCount + 4);
 
-	for (int i = 0; i < *vnameCount; i++) {
-		if (strcmp(key, vname) == 0)
-			return i;
+		for (int i = 0; i < *vnameCount; i++) {
+			if (wcscmp(wideKey.c_str(), vname) == 0)
+				return i;
 
-		vname += strlen(vname) + 1;
+			vname += wcslen(vname) + 1;
+		}
+	}
+	else {
+		char* vname = (char*)vnameCount + 4;
+
+		for (int i = 0; i < *vnameCount; i++) {
+			if (strcmp(key, vname) == 0)
+				return i;
+
+			vname += strlen(vname) + 1;
+		}
 	}
 
 	return -1;
