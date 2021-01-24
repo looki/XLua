@@ -750,7 +750,13 @@ int LuaMMF::GetCurrentEvent (lua_State *L) {
 
 	LPRH rh = state->rdList.front()->rdPtr->rHo.hoAdRunHeader;
 
-	lua_pushinteger(L, rh->rhEventGroup->evgIdentifier);
+	static bool isMMF25 = (rh->rh4.rh4Mv->mvGetVersion() & MMFVERSION_MASK) == MMFVERSION_25;
+	if (isMMF25) {
+		lua_pushinteger(L, rh->rhEventGroup->evgInhibit);
+	}
+	else {
+		lua_pushinteger(L, rh->rhEventGroup->evgIdentifier);
+	}
 
 	return 1;
 }

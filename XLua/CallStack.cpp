@@ -10,7 +10,12 @@
  */
 
 int CallStack::EventNumber () const {
-	return _state->rdList.front()->rdPtr->rHo.hoAdRunHeader->rhEventGroup->evgIdentifier;
+	auto rh = _state->rdList.front()->rdPtr->rHo.hoAdRunHeader;
+	static bool isMMF25 = (rh->rh4.rh4Mv->mvGetVersion() & MMFVERSION_MASK) == MMFVERSION_25;
+	if (isMMF25) {
+		return rh->rhEventGroup->evgInhibit;
+	}
+	return rh->rhEventGroup->evgIdentifier;
 }
 
 /**
