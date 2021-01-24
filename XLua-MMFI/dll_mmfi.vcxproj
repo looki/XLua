@@ -68,7 +68,7 @@
     <ClCompile>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;..\XLua\LuaJIT-2.0.5\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XSDK_DLL;COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -77,7 +77,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mmfs2.lib;..\XLua\Debug\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>d:\Dev\Fusion\MFAs\XLua\ext\mmfi.dll</OutputFile>
       <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -88,7 +88,7 @@
     <ClCompile>
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;..\XLua\LuaJIT-2.0.5\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XSDK_DLL;COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -97,7 +97,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mmfs2.lib;..\XLua\Debug\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>d:\Dev\Fusion\MFAs\XLua\ext\mmfi.dll</OutputFile>
       <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -109,7 +109,7 @@
       <AdditionalOptions>/D_CRT_SECURE_NO_WARNINGS /D "_SECURE_SCL=0" %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;D:\Dev\Fusion\SDKs\XLua\XLua\Lua\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;..\XLua\LuaJIT-2.0.5\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>COXSDK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -117,7 +117,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>mmfs2.lib;xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mmfs2.lib;..\XLua\Release\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)mmfi.dll</OutputFile>
       <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>

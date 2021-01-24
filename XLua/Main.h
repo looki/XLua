@@ -104,7 +104,8 @@
 #define ACT_PUSH_TABLE_PARAM_END	73
 #define ACT_PUSH_TABLE_RETURN_BEGIN	74
 #define ACT_PUSH_TABLE_RETURN_END	75
-#define	ACT_LAST					76
+#define ACT_OPEN_LIBS_FFI			76
+#define	ACT_LAST					77
 
 // -------------------------------
 // DEFINITION OF EXPRESSIONS CODES

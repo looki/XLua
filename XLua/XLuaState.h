@@ -1,14 +1,13 @@
 #ifndef XLUA_STATE_H_
 #define XLUA_STATE_H_
 
-#include	<hash_map>
+#include	<unordered_map>
 #include	<list>
 
 #include    "CallStack.h"
 #include	"TaggedType.h"
 
 #include	"lua.hpp"
-#include	"lstate.h"
 
 #ifdef XLUA_LEGACY
 	#include	"LuaXLua.h"
@@ -80,26 +79,26 @@ public:
 	LuaXLua			xlua;
 
 	// Exported object list
-	stdext::hash_map<int, MFObject>			objects;
+	std::unordered_map<int, MFObject>			objects;
 
 	// Local storage value lists
-	stdext::hash_map<int, double>			localValues;
-	stdext::hash_map<int, std::string>		localStrings;
+	std::unordered_map<int, double>			localValues;
+	std::unordered_map<int, std::string>		localStrings;
 
 	// WIN Interface exported callback list
-	stdext::hash_map<unsigned, unsigned>	winExports;
+	std::unordered_map<unsigned, unsigned>	winExports;
 
 	// Initialization checks
 	bool			mmfiReady;
 	bool			winiReady;
 
-	typedef stdext::hash_map<int, MFObject>::iterator		IObjects;
-	typedef stdext::hash_map<unsigned, unsigned>::iterator	IWinExports;
+	typedef std::unordered_map<int, MFObject>::iterator		IObjects;
+	typedef std::unordered_map<unsigned, unsigned>::iterator	IWinExports;
 #endif
 
 	enum LuaPackage {
 		PACKAGE_ALL, PACKAGE_BASE, PACKAGE_IO, PACKAGE_TABLE, PACKAGE_PACKAGE, PACKAGE_OS, PACKAGE_STRING, 
-		PACKAGE_DEBUG, PACKAGE_MATH, PACKAGE_JIT, PACKAGE_BIT, PACKAGE_GL, PACKAGE_XLUA
+		PACKAGE_DEBUG, PACKAGE_MATH, PACKAGE_JIT, PACKAGE_FFI, PACKAGE_BIT, PACKAGE_GL, PACKAGE_XLUA
 	};
 
 public:

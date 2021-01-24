@@ -2,10 +2,9 @@
 #define XLUA_GLOBAL_H_
 
 #include <list>
-#include <hash_map>
+#include <unordered_map>
 
 #include "lua.hpp"
-#include "lstate.h"
 
 // =====================================================================================
 // XLua Global State Manager
@@ -24,11 +23,11 @@ class XLuaGlobal {
 public:
 
 	// Lookup tables
-	stdext::hash_map<int, XLuaState*>			_stateTable;
-	stdext::hash_map<lua_State*, XLuaState*>	_stateLookup;
+	std::unordered_map<int, XLuaState*>			_stateTable;
+	std::unordered_map<lua_State*, XLuaState*>	_stateLookup;
 
 	// Reverse lookup table
-	stdext::hash_map<XLuaState*, int>			_idLookup;
+	std::unordered_map<XLuaState*, int>			_idLookup;
 
 #ifdef XLUA_LEGACY
 	// List of XLuaStates with active WIN interfaces
@@ -37,8 +36,8 @@ public:
 	typedef std::list<XLuaState*>::iterator		IWiniState;
 #endif
 
-	typedef	stdext::hash_map<int, XLuaState*>::iterator	IStateMap;
-	typedef stdext::hash_map<XLuaState*, int>::iterator	IIdMap;
+	typedef	std::unordered_map<int, XLuaState*>::iterator	IStateMap;
+	typedef std::unordered_map<XLuaState*, int>::iterator	IIdMap;
 	
 
 public:
@@ -74,10 +73,18 @@ inline XLuaState* XLuaGlobal::GetState (int sid) {
 	return _stateTable[sid];
 }
 
+#define XLUA_REGISTRY_MAIN_THREAD static_cast<int>('MAIN')
+
 inline XLuaState* XLuaGlobal::GetStateByState (lua_State* state) {
 	XLuaState* ret = _stateLookup[state];
-	if (!ret)
-		ret = _stateLookup[state->l_G->mainthread];
+	if (!ret) {
+		lua_State* coro_state = state;
+		lua_pushinteger(coro_state, XLUA_REGISTRY_MAIN_THREAD);
+		lua_gettable(coro_state, LUA_REGISTRYINDEX);
+		state = static_cast<lua_State*>(lua_touserdata(coro_state, -1));
+		lua_pop(coro_state, 1);
+		ret = _stateLookup[state];
+	}
 	return ret;
 }
 

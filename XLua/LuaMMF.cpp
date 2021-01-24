@@ -750,7 +750,13 @@ int LuaMMF::GetCurrentEvent (lua_State *L) {
 
 	LPRH rh = state->rdList.front()->rdPtr->rHo.hoAdRunHeader;
 
-	lua_pushinteger(L, rh->rhEventGroup->evgIdentifier);
+	static bool isMMF25 = (rh->rh4.rh4Mv->mvGetVersion() & MMFVERSION_MASK) == MMFVERSION_25;
+	if (isMMF25) {
+		lua_pushinteger(L, rh->rhEventGroup->evgInhibit);
+	}
+	else {
+		lua_pushinteger(L, rh->rhEventGroup->evgIdentifier);
+	}
 
 	return 1;
 }
@@ -1524,13 +1530,17 @@ int LuaMMF::ObjectGetValue (lua_State *L) {
 		lua_error(L);
 	}
 
+#ifndef UNICODE
 	switch (rv->rvpValues[altId].m_type) {
-		case TYPE_LONG: lua_pushinteger(L, rv->rvpValues[altId].m_long); break;
-		case TYPE_FLOAT: lua_pushnumber(L, rv->rvpValues[altId].m_double); break;
-		case TYPE_STRING: lua_pushstring(L, rv->rvpValues[altId].m_pString); break;
+	case TYPE_LONG: lua_pushinteger(L, rv->rvpValues[altId].m_long); break;
+	case TYPE_FLOAT: lua_pushnumber(L, rv->rvpValues[altId].m_double); break;
+	case TYPE_STRING: lua_pushstring(L, rv->rvpValues[altId].m_pString); break;
 	}
 
 	return 1;
+#endif
+
+	return 0;
 }
 
 int LuaMMF::ObjectGetString (lua_State *L) {
@@ -1545,12 +1555,16 @@ int LuaMMF::ObjectGetString (lua_State *L) {
 		lua_error(L);
 	}
 
+#ifndef UNICODE
 	if (rv->rvStrings[altId] == NULL) {
 		lua_pushstring(L, "");
 	}
 	else {
 		lua_pushstring(L, rv->rvStrings[altId]);
 	}
+#else
+	lua_pushstring(L, "Unicode not supported");
+#endif
 
 	return 1;
 }
@@ -1612,9 +1626,11 @@ int LuaMMF::ObjectSetString (lua_State *L) {
 		lua_error(L);
 	}
 
+#ifndef UNICODE
 	unsigned strlen = lua_objlen(L, 3);
 	rv->rvStrings[altId] = (LPSTR) mvReAlloc(obj->roHo.hoAdRunHeader->rh4.rh4Mv, rv->rvStrings[altId], strlen + 1);
 	strncpy(rv->rvStrings[altId], lua_tostring(L, 3), strlen + 1);
+#endif
 
 	return 0;
 }
@@ -2657,7 +2673,11 @@ int LuaMMF::GetGlobalValue (lua_State *L) {
 	switch (ra->m_pGlobalValues[valId].m_type) {
 		case TYPE_LONG: lua_pushinteger(L, ra->m_pGlobalValues[valId].m_long); break;
 		case TYPE_DOUBLE: lua_pushnumber(L, ra->m_pGlobalValues[valId].m_double); break;
+#ifndef UNICODE
 		case TYPE_STRING: lua_pushstring(L, ra->m_pGlobalValues[valId].m_pString); break;
+#else
+		case TYPE_STRING: lua_pushstring(L, "Unicode not supported"); break;
+#endif
 	}
 
 	return 1;
@@ -2686,7 +2706,12 @@ int LuaMMF::GetGlobalString (lua_State *L) {
 		lua_error(L);
 	}
 
+
+#ifndef UNICODE
 	lua_pushstring(L, ra->m_pGlobalString[strId]);
+#else
+	lua_pushstring(L, "Unicode not supported");
+#endif
 
 	return 1;
 }
@@ -2752,9 +2777,11 @@ int LuaMMF::SetGlobalString (lua_State *L) {
 		lua_error(L);
 	}
 
+#ifndef UNICODE
 	unsigned strlen = lua_objlen(L, 2);
 	ra->m_pGlobalString[strId] = (LPSTR) mvReAlloc(rh->rh4.rh4Mv, ra->m_pGlobalString[strId], strlen + 1);
 	strncpy(ra->m_pGlobalString[strId], lua_tostring(L, 2), strlen + 1);
+#endif
 
 	return 0;
 }

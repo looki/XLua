@@ -13,10 +13,10 @@
 
 #include <cassert>
 
-LPCSTR propModeList[] = {
+LPCTSTR propModeList[] = {
 	0,
-	"Immediate",
-	"Queued",
+	_T("Immediate"),
+	_T("Queued"),
 	NULL
 };
 
@@ -24,7 +24,7 @@ LPCSTR propModeList[] = {
 // Properties
 // --------------------
 
-#define PSTR(s)	((int)s)
+#define PSTR(s)	((int)_T(s))
 
 #define PROPID_FUNC_EXPORT PROPID_EXTITEM_CUSTOM_FIRST + 0x1000
 
@@ -659,13 +659,14 @@ void WINAPI	DLLExport CreateFromFile (LPMV mV, LPSTR fileName, LPEDATA edPtr)
 #ifndef RUN_ONLY
 void menucpy(HMENU hTargetMenu, HMENU hSourceMenu)
 {
+	#ifndef RUN_ONLY
 	int			n, id, nMn;
-	NPSTR		strBuf;
+	LPTSTR		strBuf;
 	HMENU		hSubMenu;
 
 	nMn = GetMenuItemCount(hSourceMenu);
-	strBuf = (NPSTR)LocalAlloc(LPTR, 80);
-	for (n=0; n<nMn; n++)
+	strBuf = (LPTSTR)calloc(80, sizeof(TCHAR));
+	for (n = 0; n < nMn; n++)
 	{
 		if (0 == (id = GetMenuItemID(hSourceMenu, n)))
 			AppendMenu(hTargetMenu, MF_SEPARATOR, 0, 0L);
@@ -682,7 +683,8 @@ void menucpy(HMENU hTargetMenu, HMENU hSourceMenu)
 			}
 		}
 	}
-	LocalFree((HLOCAL)strBuf);
+	free(strBuf);
+	#endif
 }
 
 // -----------------
@@ -711,54 +713,54 @@ HMENU GetPopupMenu(short mn)
 // --------------------
 // Internal routine used later. Look for one event in one of the eventInfos array...
 // No protection to go faster: you must properly enter the conditions/actions!
-//
-
+// 
 static LPEVENTINFOS2 GetEventInformations(LPEVENTINFOS2 eiPtr, short code)
 
 {
-	while(eiPtr->infos.code != code)
+	while (eiPtr->infos.code != code)
 		eiPtr = EVINFO2_NEXT(eiPtr);
-	
+
 	return eiPtr;
 }
-#endif // !RUN_ONLY
+#endif // !defined(RUN_ONLY)
 
 
 // ----------------------------------------------------
 // GetConditionMenu / GetActionMenu / GetExpressionMenu
 // ----------------------------------------------------
 // Load the condition/action/expression menu from the resource, eventually
-// enable or disable some options, and returns it to MMF2.
+// enable or disable some options, and returns it to CC&C.
 //
-HMENU WINAPI DLLExport GetConditionMenu(mv _far *mV, fpObjInfo oiPtr, LPEDATA edPtr)
+HMENU WINAPI DLLExport GetConditionMenu(mv _far* mV, fpObjInfo oiPtr, LPEDATA edPtr)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		return GetPopupMenu(MN_CONDITIONS);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return NULL;
 }
 
-HMENU WINAPI DLLExport GetActionMenu(mv _far *mV, fpObjInfo oiPtr, LPEDATA edPtr)
+HMENU WINAPI DLLExport GetActionMenu(mv _far* mV, fpObjInfo oiPtr, LPEDATA edPtr)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		return GetPopupMenu(MN_ACTIONS);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return NULL;
 }
 
-HMENU WINAPI DLLExport GetExpressionMenu(mv _far *mV, fpObjInfo oiPtr, LPEDATA edPtr)
+HMENU WINAPI DLLExport GetExpressionMenu(mv _far* mV, fpObjInfo oiPtr, LPEDATA edPtr)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		return GetPopupMenu(MN_EXPRESSIONS);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return NULL;
 }
+
 
 // -------------------------------------------------------
 // GetConditionTitle / GetActionTitle / GetExpressionTitle
@@ -769,22 +771,22 @@ HMENU WINAPI DLLExport GetExpressionMenu(mv _far *mV, fpObjInfo oiPtr, LPEDATA e
 //
 
 #ifndef RUN_ONLY
-void GetCodeTitle(LPEVENTINFOS2 eiPtr, short code, short param, short mn, LPSTR strBuf, WORD maxLen)
+void GetCodeTitle(LPEVENTINFOS2 eiPtr, short code, short param, short mn, LPTSTR strBuf, WORD maxLen)
 {
 	HMENU		hMn;
 
 	// Finds event in array
-	eiPtr=GetEventInformations(eiPtr, code);
+	eiPtr = GetEventInformations(eiPtr, code);
 
 	// If a special string is to be returned
 	short strID = EVINFO2_PARAMTITLE(eiPtr, param);
 
-	if ( strID != 0 )
+	if (strID != 0)
 		LoadString(hInstLib, strID, strBuf, maxLen);
 	else
 	{
 		// Otherwise, returns the menu option 
-		if ((hMn = LoadMenu(hInstLib, MAKEINTRESOURCE(mn))) != NULL )
+		if ((hMn = LoadMenu(hInstLib, MAKEINTRESOURCE(mn))) != NULL)
 		{
 			GetMenuString(hMn, eiPtr->menu, strBuf, maxLen, MF_BYCOMMAND);
 			DestroyMenu(hMn);
@@ -795,13 +797,16 @@ void GetCodeTitle(LPEVENTINFOS2 eiPtr, short code, short param, short mn, LPSTR 
 #define GetCodeTitle(a,b,c,d,e,f)
 #endif // !defined(RUN_ONLY)
 
-void WINAPI DLLExport GetConditionTitle(mv _far *mV, short code, short param, LPSTR strBuf, short maxLen) {
+void WINAPI DLLExport GetConditionTitle(mv _far* mV, short code, short param, LPTSTR strBuf, short maxLen)
+{
 	GetCodeTitle((LPEVENTINFOS2)conditionsInfos, code, param, MN_CONDITIONS, strBuf, maxLen);
 }
-void WINAPI DLLExport GetActionTitle(mv _far *mV, short code, short param, LPSTR strBuf, short maxLen) {
+void WINAPI DLLExport GetActionTitle(mv _far* mV, short code, short param, LPTSTR strBuf, short maxLen)
+{
 	GetCodeTitle((LPEVENTINFOS2)actionsInfos, code, param, MN_ACTIONS, strBuf, maxLen);
 }
-void WINAPI DLLExport GetExpressionTitle(mv _far *mV, short code, LPSTR strBuf, short maxLen) {
+void WINAPI DLLExport GetExpressionTitle(mv _far* mV, short code, LPTSTR strBuf, short maxLen)
+{
 	GetCodeTitle((LPEVENTINFOS2)expressionsInfos, code, 0, MN_EXPRESSIONS, strBuf, maxLen);
 }
 
@@ -812,47 +817,48 @@ void WINAPI DLLExport GetExpressionTitle(mv _far *mV, short code, LPSTR strBuf, 
 // action or expression, as defined in the .H file
 //
 
-short WINAPI DLLExport GetConditionCodeFromMenu(mv _far *mV, short menuId)
+short WINAPI DLLExport GetConditionCodeFromMenu(mv _far* mV, short menuId)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	LPEVENTINFOS2	eiPtr;
 	int				n;
 
-	for (n=CND_LAST, eiPtr=(LPEVENTINFOS2)conditionsInfos; n>0 && eiPtr->menu!=menuId; n--)
+	for (n = CND_LAST, eiPtr = (LPEVENTINFOS2)conditionsInfos; n > 0 && eiPtr->menu != menuId; n--)
 		eiPtr = EVINFO2_NEXT(eiPtr);
-	if (n>0) 
+	if (n > 0)
 		return eiPtr->infos.code;
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return -1;
 }
 
-short WINAPI DLLExport GetActionCodeFromMenu(mv _far *mV, short menuId)
+short WINAPI DLLExport GetActionCodeFromMenu(mv _far* mV, short menuId)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	LPEVENTINFOS2	eiPtr;
 	int				n;
 
-	for (n=ACT_LAST, eiPtr=(LPEVENTINFOS2)actionsInfos; n>0 && eiPtr->menu!=menuId; n--)
+	for (n = ACT_LAST, eiPtr = (LPEVENTINFOS2)actionsInfos; n > 0 && eiPtr->menu != menuId; n--)
 		eiPtr = EVINFO2_NEXT(eiPtr);
-	if (n>0) 
+	if (n > 0)
 		return eiPtr->infos.code;
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return -1;
 }
 
-short WINAPI DLLExport GetExpressionCodeFromMenu(mv _far *mV, short menuId)
+short WINAPI DLLExport GetExpressionCodeFromMenu(mv _far* mV, short menuId)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	LPEVENTINFOS2	eiPtr;
 	int				n;
 
-	for (n=EXP_LAST, eiPtr=(LPEVENTINFOS2)expressionsInfos; n>0 && eiPtr->menu!=menuId; n--)
+	for (n = EXP_LAST, eiPtr = (LPEVENTINFOS2)expressionsInfos; n > 0 && eiPtr->menu != menuId; n--)
 		eiPtr = EVINFO2_NEXT(eiPtr);
-	if (n>0) 
+	if (n > 0)
 		return eiPtr->infos.code;
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 	return -1;
 }
+
 
 // -------------------------------------------------------
 // GetConditionInfos / GetActionInfos / GetExpressionInfos
@@ -896,55 +902,56 @@ LPINFOEVENTSV2 WINAPI DLLExport GetExpressionInfos(mv _far *mV, short code)
 // the string to use for displaying it under the event editor
 //
 
-void WINAPI DLLExport GetConditionString(mv _far *mV, short code, LPSTR strPtr, short maxLen)
+void WINAPI DLLExport GetConditionString(mv _far* mV, short code, LPTSTR strPtr, short maxLen)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		LoadString(hInstLib, GetEventInformations((LPEVENTINFOS2)conditionsInfos, code)->string, strPtr, maxLen);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 }
 
-void WINAPI DLLExport GetActionString(mv _far *mV, short code, LPSTR strPtr, short maxLen)
+void WINAPI DLLExport GetActionString(mv _far* mV, short code, LPTSTR strPtr, short maxLen)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		LoadString(hInstLib, GetEventInformations((LPEVENTINFOS2)actionsInfos, code)->string, strPtr, maxLen);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 }
 
-void WINAPI DLLExport GetExpressionString(mv _far *mV, short code, LPSTR strPtr, short maxLen)
+void WINAPI DLLExport GetExpressionString(mv _far* mV, short code, LPTSTR strPtr, short maxLen)
 {
-#ifndef RUN_ONLY
+	#ifndef RUN_ONLY
 	// Check compatibility
-	if ( IS_COMPATIBLE(mV) )
+	if (IS_COMPATIBLE(mV))
 		LoadString(hInstLib, GetEventInformations((LPEVENTINFOS2)expressionsInfos, code)->string, strPtr, maxLen);
-#endif // !defined(RUN_ONLY)
+	#endif // !defined(RUN_ONLY)
 }
+
 
 // ----------------------------------------------------------
 // GetExpressionParam
 // ----------------------------------------------------------
 // Returns the parameter name to display in the expression editor
 //
-
-void WINAPI DLLExport GetExpressionParam(mv _far *mV, short code, short param, LPSTR strBuf, short maxLen)
+void WINAPI DLLExport GetExpressionParam(mv _far* mV, short code, short param, LPTSTR strBuf, short maxLen)
 {
-#if !defined(RUN_ONLY)
+	#if !defined(RUN_ONLY)
 	short		strID;
 
 	// Finds event in array
-	LPEVENTINFOS2 eiPtr=GetEventInformations((LPEVENTINFOS2)expressionsInfos, code);
+	LPEVENTINFOS2 eiPtr = GetEventInformations((LPEVENTINFOS2)expressionsInfos, code);
 
 	// If a special string is to be returned
 	strID = EVINFO2_PARAMTITLE(eiPtr, param);
-	if ( strID != 0 )
+	if (strID != 0)
 		LoadString(hInstLib, strID, strBuf, maxLen);
 	else
-		*strBuf=0;
-#endif // !defined(RUN_ONLY)
+		*strBuf = 0;
+	#endif // !defined(RUN_ONLY)
 }
+
 
 // ----------------------------------------------------------
 // Custom Parameters
@@ -1054,14 +1061,16 @@ void WINAPI GetParameterString(mv _far *mV, short code, paramExt* pExt, LPSTR pD
 // Note: ObjComment is also displayed in the Quick Description box in the Insert Object dialog box
 //
 
-void WINAPI	DLLExport GetObjInfos (mv _far *mV, LPEDATA edPtr, LPSTR ObjName, LPSTR ObjAuthor, LPSTR ObjCopyright, LPSTR ObjComment, LPSTR ObjHttp)
+void WINAPI	DLLExport GetObjInfos(mv _far* mV, LPEDATA edPtr, LPTSTR ObjName, LPTSTR ObjAuthor, LPTSTR ObjCopyright, LPTSTR ObjComment, LPTSTR ObjHttp)
 {
 #ifndef RUN_ONLY
-	strcpy(ObjName,ObjectName);
-	strcpy(ObjAuthor,ObjectAuthor);
-	strcpy(ObjCopyright,ObjectCopyright);
-	strcpy(ObjComment,ObjectComment);
-	strcpy(ObjHttp,ObjectURL);
+
+	_tcscpy(ObjName, ObjectName);
+	_tcscpy(ObjAuthor, ObjectAuthor);
+	_tcscpy(ObjCopyright, ObjectCopyright);
+	_tcscpy(ObjComment, ObjectComment);
+	_tcscpy(ObjHttp, ObjectURL);
+
 #endif
 }
 
@@ -1071,7 +1080,7 @@ void WINAPI	DLLExport GetObjInfos (mv _far *mV, LPEDATA edPtr, LPSTR ObjName, LP
 // Returns the help filename of the object.
 //
 
-LPCSTR WINAPI GetHelpFileName()
+LPCTSTR WINAPI GetHelpFileName()
 {
 #ifndef RUN_ONLY
 	return ObjectHelp;

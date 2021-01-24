@@ -47,9 +47,15 @@ XLuaState::XLuaState ()
 	lua_pushcfunction(state, XLuaState::LuaC_DoCallG);
 	lua_setglobal(state, "DoCallG");
 
-	// REgister print function
+	// Register print function
 	lua_pushcfunction(state, XLuaState::LuaC_Print);
 	lua_setglobal(state, "print");
+
+	// Register pointer to ourself in the registry - workaround to retrieve
+	// the main state in coroutines in LuaJIT 2.0
+	lua_pushinteger(state, XLUA_REGISTRY_MAIN_THREAD);
+	lua_pushlightuserdata(state, state);
+	lua_rawset(state, LUA_REGISTRYINDEX);
 
 #ifdef XLUA_LEGACY
 	xlua.Register();
@@ -268,6 +274,7 @@ void XLuaState::LoadDefaultLib(XLuaState::LuaPackage pkg) {
 		case PACKAGE_STRING: stat = lua_cpcall(state, luaopen_string, 0); break;
 		case PACKAGE_DEBUG: stat = lua_cpcall(state, luaopen_debug, 0); break;
 		case PACKAGE_JIT: stat = lua_cpcall(state, luaopen_jit, 0); break;
+		case PACKAGE_FFI: stat = lua_cpcall(state, luaopen_ffi, 0); break;
 		case PACKAGE_BIT: stat = lua_cpcall(state, luaopen_bit, 0); break;
 #ifdef XLUA_LEGACY
 		case PACKAGE_XLUA: stat = 0; xlua.Register(); break;
@@ -625,7 +632,7 @@ void XLuaState::RestoreObjectSelection (const char* loc) {
 	}
 
 	int sp = lua_gettop(state);
-	stdext::hash_map<short, short> oiMap;
+	std::unordered_map<short, short> oiMap;
 
 	lua_pushnil(state);  /* first key */
 	while (lua_next(state, sp)) {
@@ -1087,6 +1094,7 @@ int XLuaState::LuaC_RegCall (lua_State *L) {
 
 	int minParams = lua_tointeger(L, lua_upvalueindex(3));
 	int actualParams = lua_gettop(L);
+
 	if (actualParams < minParams) {
 		luaL_error(L, "Function %s expected %d parameters, got %d", func, minParams, actualParams);
 	}
@@ -1172,9 +1180,6 @@ int XLuaState::LuaC_Print (lua_State* L) {
 	return 0;
 }
 
-extern "C" int db_errorfb (lua_State *L);
-
-
 static int err(lua_State* L) {
 	const char* msg = lua_tostring(L, 1);
 	puts(msg);
@@ -1202,11 +1207,15 @@ int XLuaState::LuaC_Error (lua_State *L) {
 			if (lm->useBacktrace) {
 				// Let's be lazy about any backtrace calculations
 				if (bt.empty()) {
-					lua_pushinteger(L, 1);
-					db_errorfb(L);
-					bt = lua_tostring(L, 1);
+					size_t length = 0;
+					lua_tolstring(L, 1, &length);
+					std::vector<char> message(length + 1);
+					memcpy(&message[0], lua_tostring(L, 1), length);
+					lua_pop(L, 1);
+					luaL_traceback(L, L, message.data(), 1);
+					bt = lua_tostring(L, -1);
 				}
-
+				
 				lm->RaiseError(bt + "\r\n");
 			}
 			else {
@@ -1218,9 +1227,6 @@ int XLuaState::LuaC_Error (lua_State *L) {
 
 	return 0;
 }
-
-#include "opt.h"
-#include "opt_inline.h"
 
 int XLuaState::LuaC_SetupJIT (lua_State* L) {
 	XLuaState* state = XLuaGlobal::Get().GetStateByState(L);
@@ -1235,30 +1241,6 @@ int XLuaState::LuaC_SetupJIT (lua_State* L) {
 	lua_getglobal(L, "jit");
 	lua_getfield(L, -1, "on");
 	lua_call(L, 0, 0);
-
-	// Load opt modules into preload
-	lua_getglobal(L, "package");
-	lua_getfield(L, -1, "preload");
-
-	luaL_loadbuffer(L, (const char*)(&opt_lua_bytes), opt_lua_sz, "jit.opt");
-	lua_setfield(L, -2, "jit.opt");
-	
-	luaL_loadbuffer(L, (const char*)(&opt_inline_lua_bytes), opt_inline_lua_sz, "jit.opt_inline");
-	lua_setfield(L, -2, "jit.opt_inline");
-
-	// Formally load optimizer
-	lua_getglobal(L, "require");
-	lua_pushliteral(L, "jit.opt");
-	if (lua_pcall(L, 1, 1, 0)) {
-		state->RaiseError("Could not load module jit.opt: Optimization is disabled.");
-		return 0;
-	}
-	
-	lua_getfield(L, -1, "start");
-	if (lua_pcall(L, 0, 0, 0)) {
-		state->RaiseError("Could not call jit.opt init function: Optimization is disabled.");
-		return 0;
-	}
 
 	return 0;
 }

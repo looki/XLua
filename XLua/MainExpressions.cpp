@@ -1,4 +1,5 @@
 #include "Common.h"
+#include "UnicodeHelpers.h"
 
 // Quick memo: content of the eventInformations arrays
 // ---------------------------------------------------
@@ -48,16 +49,16 @@ short expressionsInfos[] = {
 	IDMN_EXP_EMBEDDED,					M_EXP_EMBEDDED,					EXP_EMBEDDED,					EXPFLAG_STRING, 1,	EXPPARAM_STRING, M_SCRIPT_NAME,
 };
 
-// char* ExpErrorStr ()
-long WINAPI DLLExport ExpErrorStr (LPRDATA rdPtr,long param1) {
-	const std::string& ret = rdPtr->luaMan->GetError();
-	
+// TCHAR* ExpErrorStr ()
+long WINAPI DLLExport ExpErrorStr(LPRDATA rdPtr, long param1) {
+	TempMMFString ret(rdPtr, rdPtr->luaMan->GetError());
+
 	rdPtr->rHo.hoFlags |= HOF_STRING;
-	return (long) ret.c_str();
+	return (long)ret.c_str();
 }
 
 // int ExpIntReturn (int index)
-long WINAPI DLLExport ExpIntReturn (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpIntReturn(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
@@ -65,32 +66,30 @@ long WINAPI DLLExport ExpIntReturn (LPRDATA rdPtr,long param1) {
 	}
 
 	unsigned fpcontrol = fp_precision_double();
-	int ret = (int) rdPtr->luaMan->state->stack.GetNumberReturn(p1);
+	int ret = (int)rdPtr->luaMan->state->stack.GetNumberReturn(p1);
 	fp_precision_restore(fpcontrol);
 
 	return ret;
 }
 
-// char* ExpStrReturn (int index)
-long WINAPI DLLExport ExpStrReturn (LPRDATA rdPtr, long param1) {
+// TCHAR* ExpStrReturn (int index)
+long WINAPI DLLExport ExpStrReturn(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringReturn(p1);
-	
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringReturn(p1));
+
+
+	return (long)ret.c_str();
 }
 
 // int ExpBoolReturn (int index)
-long WINAPI DLLExport ExpBoolReturn (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpBoolReturn(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
@@ -101,7 +100,7 @@ long WINAPI DLLExport ExpBoolReturn (LPRDATA rdPtr,long param1) {
 }
 
 // int ExpReturnCount ()
-long WINAPI DLLExport ExpReturnCount (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpReturnCount(LPRDATA rdPtr, long param1) {
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
 	}
@@ -110,7 +109,7 @@ long WINAPI DLLExport ExpReturnCount (LPRDATA rdPtr,long param1) {
 }
 
 // int ExpIntParam (int index)
-long WINAPI DLLExport ExpIntParam (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpIntParam(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
@@ -118,32 +117,30 @@ long WINAPI DLLExport ExpIntParam (LPRDATA rdPtr,long param1) {
 	}
 
 	unsigned fpcontrol = fp_precision_double();
-	int ret = (int) rdPtr->luaMan->state->stack.GetNumberParam(p1);
+	int ret = (int)rdPtr->luaMan->state->stack.GetNumberParam(p1);
 	fp_precision_restore(fpcontrol);
 
 	return ret;
 }
 
-// char* ExpStrParam (int index)
-long WINAPI DLLExport ExpStrParam (LPRDATA rdPtr,long param1) {
+// TCHAR* ExpStrParam (int index)
+long WINAPI DLLExport ExpStrParam(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringParam(p1);
-	
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringParam(p1));
+
+
+	return (long)ret.c_str();
 }
 
 // int ExpBoolParam (int index)
-long WINAPI DLLExport ExpBoolParam (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpBoolParam(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
@@ -154,7 +151,7 @@ long WINAPI DLLExport ExpBoolParam (LPRDATA rdPtr,long param1) {
 }
 
 // int ExpParamCount ()
-long WINAPI DLLExport ExpParamCount (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpParamCount(LPRDATA rdPtr, long param1) {
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
 	}
@@ -162,9 +159,9 @@ long WINAPI DLLExport ExpParamCount (LPRDATA rdPtr,long param1) {
 	return rdPtr->luaMan->state->stack.GetParamCount();
 }
 
-// int ExpIntVar (char* var)
-long WINAPI DLLExport ExpIntVar (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// int ExpIntVar (TCHAR* var)
+long WINAPI DLLExport ExpIntVar(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -173,26 +170,24 @@ long WINAPI DLLExport ExpIntVar (LPRDATA rdPtr,long param1) {
 	return rdPtr->luaMan->state->GetNumericVariable(p1);
 }
 
-// char* ExpStrVar (char* var)
-long WINAPI DLLExport ExpStrVar (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpStrVar (TCHAR* var)
+long WINAPI DLLExport ExpStrVar(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
-	const std::string& ret = rdPtr->luaMan->state->GetStringVariable(p1);
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->GetStringVariable(p1));
+
+	return (long)ret.c_str();
 }
 
-// int ExpBoolVar (char* var)
-long WINAPI DLLExport ExpBoolVar (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// int ExpBoolVar (TCHAR* var)
+long WINAPI DLLExport ExpBoolVar(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -202,59 +197,55 @@ long WINAPI DLLExport ExpBoolVar (LPRDATA rdPtr,long param1) {
 }
 
 // float ExpLocalVal (int id)
-long WINAPI DLLExport ExpLocalVal (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpLocalVal(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_FLOAT;
 
-#ifdef XLUA_LEGACY
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
 	}
 
-	float ret = (float) rdPtr->luaMan->state->GetLocalValue(p1);
+	float ret = (float)rdPtr->luaMan->state->GetLocalValue(p1);
 
 	return *((int*)&ret);
-#else
+	#else
 	return 0;
-#endif
+	#endif
 }
 
-// char* ExpLocalStr (char* var)
-long WINAPI DLLExport ExpLocalStr (LPRDATA rdPtr,long param1) {
+// TCHAR* ExpLocalStr (TCHAR* var)
+long WINAPI DLLExport ExpLocalStr(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
-#ifdef XLUA_LEGACY
+	#ifdef XLUA_LEGACY
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
-	const std::string& ret = rdPtr->luaMan->state->GetLocalString(p1);
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
-#else
-	return (long) "";
-#endif
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->GetLocalString(p1));
+
+	return (long)ret.c_str();
+	#else
+	return (long)_T("");
+	#endif
 }
 
-// char* ExpPrintStr ()
-long WINAPI DLLExport ExpPrintStr (LPRDATA rdPtr,long param1) {
-	const std::string& ret = rdPtr->luaMan->GetPrint();
-	
+// TCHAR* ExpPrintStr ()
+long WINAPI DLLExport ExpPrintStr(LPRDATA rdPtr, long param1) {
+	TempMMFString ret(rdPtr, rdPtr->luaMan->GetPrint());
+
 	rdPtr->rHo.hoFlags |= HOF_STRING;
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	return (long)ret.c_str();
 	//return (long) ret.c_str();
 }
 
-// int ExpIntFunc (char* func)
-long WINAPI DLLExport ExpIntFunc (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// int ExpIntFunc (TCHAR* func)
+long WINAPI DLLExport ExpIntFunc(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -263,35 +254,33 @@ long WINAPI DLLExport ExpIntFunc (LPRDATA rdPtr,long param1) {
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
 	unsigned fpcontrol = fp_precision_double();
-	int ret = (int) rdPtr->luaMan->state->stack.GetNumberReturn(1);
+	int ret = (int)rdPtr->luaMan->state->stack.GetNumberReturn(1);
 	fp_precision_restore(fpcontrol);
 
 	return ret;
 }
 
-// char* ExpStrFunc (char* func)
-long WINAPI DLLExport ExpStrFunc (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpStrFunc (TCHAR* func)
+long WINAPI DLLExport ExpStrFunc(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringReturn(1);
-	
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringReturn(1));
+
+
+	return (long)ret.c_str();
 }
 
-// int ExpIntFuncNP (char* func)
-long WINAPI DLLExport ExpIntFuncNP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// int ExpIntFuncNP (TCHAR* func)
+long WINAPI DLLExport ExpIntFuncNP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 	long p2 = CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
@@ -303,16 +292,16 @@ long WINAPI DLLExport ExpIntFuncNP (LPRDATA rdPtr,long param1) {
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
 	unsigned fpcontrol = fp_precision_double();
-	int ret = (int) rdPtr->luaMan->state->stack.GetNumberReturn(1);
+	int ret = (int)rdPtr->luaMan->state->stack.GetNumberReturn(1);
 	fp_precision_restore(fpcontrol);
 
 	return ret;
 }
 
-// int ExpIntFuncSP (char* func)
-long WINAPI DLLExport ExpIntFuncSP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
-	char* p2 = (char*) CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
+// int ExpIntFuncSP (TCHAR* func)
+long WINAPI DLLExport ExpIntFuncSP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+	TCHAR* p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -323,73 +312,69 @@ long WINAPI DLLExport ExpIntFuncSP (LPRDATA rdPtr,long param1) {
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
 	unsigned fpcontrol = fp_precision_double();
-	int ret = (int) rdPtr->luaMan->state->stack.GetNumberReturn(1);
+	int ret = (int)rdPtr->luaMan->state->stack.GetNumberReturn(1);
 	fp_precision_restore(fpcontrol);
 
 	return ret;
 }
 
-// char* ExpStrFuncNP (char* func)
-long WINAPI DLLExport ExpStrFuncNP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpStrFuncNP (TCHAR* func)
+long WINAPI DLLExport ExpStrFuncNP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 	long p2 = CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
 	rdPtr->luaMan->state->stack.ClearLFParameters();
 	rdPtr->luaMan->state->stack.PushParam(p2);
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringReturn(1);
-	
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringReturn(1));
+
+
+	return (long)ret.c_str();
 }
 
-// char* ExpStrFuncSP (char* func)
-long WINAPI DLLExport ExpStrFuncSP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
-	char* p2 = (char*) CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpStrFuncSP (TCHAR* func)
+long WINAPI DLLExport ExpStrFuncSP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+	TCHAR* p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
 	rdPtr->luaMan->state->stack.ClearLFParameters();
 	rdPtr->luaMan->state->stack.PushParam(p2);
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringReturn(1);
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringReturn(1));
+
+	return (long)ret.c_str();
 }
 
 // float ExpFloatReturn (int index)
-long WINAPI DLLExport ExpFloatReturn (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpFloatReturn(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
 	}
 
-	float ret = (float) rdPtr->luaMan->state->stack.GetNumberReturn(p1);
+	float ret = (float)rdPtr->luaMan->state->stack.GetNumberReturn(p1);
 
 	rdPtr->rHo.hoFlags |= HOF_FLOAT;
 	return *((int*)&ret);
 }
 
 // float ExpFloatParam (int index)
-long WINAPI DLLExport ExpFloatParam (LPRDATA rdPtr,long param1) {
+long WINAPI DLLExport ExpFloatParam(LPRDATA rdPtr, long param1) {
 	long p1 = CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_INT);
 
 	rdPtr->rHo.hoFlags |= HOF_FLOAT;
@@ -398,13 +383,13 @@ long WINAPI DLLExport ExpFloatParam (LPRDATA rdPtr,long param1) {
 		return 0;
 	}
 
-	float ret = (float) rdPtr->luaMan->state->stack.GetNumberParam(p1);
+	float ret = (float)rdPtr->luaMan->state->stack.GetNumberParam(p1);
 	return *((int*)&ret);
 }
 
 // float ExpFloatFunc (int index)
-long WINAPI DLLExport ExpFloatFunc (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+long WINAPI DLLExport ExpFloatFunc(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_FLOAT;
 
@@ -414,13 +399,13 @@ long WINAPI DLLExport ExpFloatFunc (LPRDATA rdPtr,long param1) {
 
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	float ret = (float) rdPtr->luaMan->state->stack.GetNumberReturn(1);
+	float ret = (float)rdPtr->luaMan->state->stack.GetNumberReturn(1);
 	return *((int*)&ret);
 }
 
 // float ExpFloatFuncFP (int index)
-long WINAPI DLLExport ExpFloatFuncFP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+long WINAPI DLLExport ExpFloatFuncFP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 	long t2 = CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_FLOAT);
 
 	float p2 = *((float*)&t2);
@@ -435,13 +420,13 @@ long WINAPI DLLExport ExpFloatFuncFP (LPRDATA rdPtr,long param1) {
 	rdPtr->luaMan->state->stack.PushParam(p2);
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	float ret = (float) rdPtr->luaMan->state->stack.GetNumberReturn(1);
+	float ret = (float)rdPtr->luaMan->state->stack.GetNumberReturn(1);
 	return *((int*)&ret);
 }
 
-// char* ExpStrFuncFP (char* func)
-long WINAPI DLLExport ExpStrFuncFP (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpStrFuncFP (TCHAR* func)
+long WINAPI DLLExport ExpStrFuncFP(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 	long t2 = CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_FLOAT);
 
 	float p2 = *((float*)&t2);
@@ -449,23 +434,21 @@ long WINAPI DLLExport ExpStrFuncFP (LPRDATA rdPtr,long param1) {
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
 	rdPtr->luaMan->state->stack.ClearLFParameters();
 	rdPtr->luaMan->state->stack.PushParam(p2);
 	rdPtr->luaMan->state->stack.CallLuaFunction(p1);
 
-	const std::string& ret = rdPtr->luaMan->state->stack.GetStringReturn(1);
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->stack.GetStringReturn(1));
+
+	return (long)ret.c_str();
 }
 
-// float ExpFloatVar (char* var)
-long WINAPI DLLExport ExpFloatVar (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// float ExpFloatVar (TCHAR* var)
+long WINAPI DLLExport ExpFloatVar(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_FLOAT;
 
@@ -473,13 +456,13 @@ long WINAPI DLLExport ExpFloatVar (LPRDATA rdPtr,long param1) {
 		return 0;
 	}
 
-	float ret = (float) rdPtr->luaMan->state->GetFloatingVariable(p1);
+	float ret = (float)rdPtr->luaMan->state->GetFloatingVariable(p1);
 	return *((int*)&ret);
 }
 
 // int ExpTableLength ()
-long WINAPI DLLExport ExpTableLength (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+long WINAPI DLLExport ExpTableLength(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -489,8 +472,8 @@ long WINAPI DLLExport ExpTableLength (LPRDATA rdPtr,long param1) {
 }
 
 // int ExpTableMaxn ()
-long WINAPI DLLExport ExpTableMaxn (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+long WINAPI DLLExport ExpTableMaxn(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -499,79 +482,73 @@ long WINAPI DLLExport ExpTableMaxn (LPRDATA rdPtr,long param1) {
 	return rdPtr->luaMan->state->GetTableMaxIndex(p1);
 }
 
-// char* ExpEmbeddedDep ()
-long WINAPI DLLExport ExpEmbeddedDep (LPRDATA rdPtr,long param1) {
-#ifdef XLUA_LEGACY
-	const std::string& ret = rdPtr->luaMan->GetEmbeddedScript("Main");
-	
+// TCHAR* ExpEmbeddedDep ()
+long WINAPI DLLExport ExpEmbeddedDep(LPRDATA rdPtr, long param1) {
+	#ifdef XLUA_LEGACY
+	TempMMFString ret(rdPtr, rdPtr->luaMan->GetEmbeddedScript("Main"));
+
 	rdPtr->rHo.hoFlags |= HOF_STRING;
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
-#else
-	return (long) "";
-#endif
+	return (long)ret.c_str();
+	#else
+	return (long)_T("");
+	#endif
 }
 
-// char* ExpErrMode ()
-long WINAPI DLLExport ExpErrMode (LPRDATA rdPtr,long param1) {
-	char* str = 0;
+// TCHAR* ExpErrMode ()
+long WINAPI DLLExport ExpErrMode(LPRDATA rdPtr, long param1) {
+	TCHAR* str = 0;
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->errMode == 0) {
-		return (long) "Immediate";
+		return (long)_T("Immediate");
 	}
 	else if (rdPtr->luaMan->errMode == 1) {
-		return (long) "Queued";
+		return (long)_T("Queued");
 	}
 
-	return (long) "";
+	return (long)_T("");
 }
 
-// char* ExpPrintMode ()
-long WINAPI DLLExport ExpPrintMode (LPRDATA rdPtr,long param1) {
-	char* str = 0;
+// TCHAR* ExpPrintMode ()
+long WINAPI DLLExport ExpPrintMode(LPRDATA rdPtr, long param1) {
+	TCHAR* str = 0;
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->printMode == 0) {
-		return (long) "Immediate";
+		return (long)_T("Immediate");
 	}
 	else if (rdPtr->luaMan->printMode == 1) {
-		return (long) "Queued";
+		return (long)_T("Queued");
 	}
 
-	return (long) "";
+	return (long)_T("");
 }
 
-// char* ExpVarType (char* var)
-long WINAPI DLLExport ExpVarType (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpVarType (TCHAR* var)
+long WINAPI DLLExport ExpVarType(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
 	if (rdPtr->luaMan->state == NULL) {
-		return (long) "";
+		return (long)_T("");
 	}
 
-	const std::string& ret = rdPtr->luaMan->state->GetVariableType(p1);
-	
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	TempMMFString ret(rdPtr, rdPtr->luaMan->state->GetVariableType(p1));
+
+	return (long)ret.c_str();
 }
 
-// char* ExpEmbeddedScript (char* var)
-long WINAPI DLLExport ExpEmbeddedScript (LPRDATA rdPtr,long param1) {
-	char* p1 = (char*) CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
+// TCHAR* ExpEmbeddedScript (TCHAR* var)
+long WINAPI DLLExport ExpEmbeddedScript(LPRDATA rdPtr, long param1) {
+	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
 
-	const std::string& ret = rdPtr->luaMan->GetEmbeddedScript(p1);
-	
+	TempMMFString ret(rdPtr, rdPtr->luaMan->GetEmbeddedScript(p1));
+
 	rdPtr->rHo.hoFlags |= HOF_STRING;
-	char* str = (char*) callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, ret.size() + 1);
-	memcpy(str, ret.c_str(), ret.size() + 1);
-	return (long) str;
+	return (long)ret.c_str();
 }
 
 // ----------------------------------------------------------
@@ -582,7 +559,7 @@ long WINAPI DLLExport ExpEmbeddedScript (LPRDATA rdPtr,long param1) {
 // Located at the end of the source for convinience
 // Must finish with a 0
 //
-long (WINAPI * ExpressionJumps[])(LPRDATA rdPtr, long param) = {
+long (WINAPI* ExpressionJumps[])(LPRDATA rdPtr, long param) = {
 	ExpErrorStr,
 	ExpIntReturn,
 	ExpStrReturn,

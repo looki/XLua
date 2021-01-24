@@ -3,12 +3,12 @@
 // --------------------
 
 // Basic object details
-#define	ObjectName			"XLua"
-#define	ObjectAuthor		"Justin Aquadro"
-#define	ObjectCopyright		"Copyright © 2009 Justin Aquadro"
-#define	ObjectComment		"Powerful and extensible embedded Lua support for MMF2"
-#define	ObjectURL			"http://www.taloncrossing.com/xlua"
-#define	ObjectHelp			"Help\\XLua.chm"
+#define	ObjectName			_T("XLua")
+#define	ObjectAuthor		_T("Justin Aquadro, Lukas Meller")
+#define	ObjectCopyright		_T("Copyright © 2009-2021 Justin Aquadro")
+#define	ObjectComment		_T("Powerful and extensible embedded Lua support for MMF2 & CTF 2.5(+).")
+#define	ObjectURL			_T("http://www.taloncrossing.com/xlua")
+#define	ObjectHelp			_T("Help\\XLua.chm")
 
 // If you register your object with Clickteam, change this to the ID you were given
 //#define ObjectRegID			REGID_PRIVATE
@@ -37,7 +37,7 @@
 // #define POPUP_ON_DROP
 // #define POPUP_ON_EXE
 // #define POPUP_ON_BUILD
-// #define POPUP_MESSAGE	"This is a beta extension- use with caution!"
+// #define POPUP_MESSAGE	_T("This is a beta extension- use with caution!")
 
 // --------------------
 // Handling priority

@@ -1,5 +1,8 @@
 #include "object.h"
 
+#define FORCE_UNICODE_HELPERS
+#include "../XLua/UnicodeHelpers.h"
+
 // All lookup functions for values require subtables.  Create and
 // memoize corresponding lookup tables so we only pay the metatable
 // price once
@@ -160,14 +163,12 @@ int Values::Value (lua_State* L) {
 		// Can alterables ever be strings? Perhaps using the MMFI only
 		if (IsUnicode(ho)) {
 			WCHAR* wideString = (WCHAR*)cvalue->m_pString;
+
 			if (wideString == nullptr) {
 				return 0;
 			}
-			const size_t size = wcslen(wideString) + 1;
-			char* string = new char[size];
-			wcstombs(string, wideString, size);
-			lua_pushstring(L, string);
-			delete[] string;
+			TempLuaString luaString(wideString);
+			lua_pushstring(L, luaString.c_str());
 		}
 		else {
 			lua_pushstring(L, cvalue->m_pString);
@@ -214,11 +215,11 @@ int Values::String (lua_State* L) {
 	}
 	else if (IsUnicode(ho)) {
 		WCHAR* wideString = (WCHAR*)altString;
-		const size_t size = wcslen(wideString) + 1;
-		char* string = new char[size];
-		wcstombs(string, wideString, size);
-		lua_pushstring(L, string);
-		delete[] string;
+		if (wideString == nullptr) {
+			return 0;
+		}
+		TempLuaString luaString(wideString);
+		lua_pushstring(L, luaString.c_str());
 	}
 	else {
 		lua_pushstring(L, altString);
@@ -339,9 +340,9 @@ int Values::SetString (lua_State* L) {
 	}
 	}
 
-	unsigned slen = lua_objlen(L, 3);
 	if (IsUnicode(ho)) {
-		auto size = slen + 1;
+		TempMMFString str(lua_tostring(L, 3));
+		auto size = wcslen(str.c_str()) + 1;
 		if (*targetString != nullptr) {
 			auto prevValue = *targetString;
 			*targetString = (LPSTR)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, *targetString, sizeof(WCHAR) * size);
@@ -349,9 +350,11 @@ int Values::SetString (lua_State* L) {
 		else {
 			*targetString = (LPSTR)mvCalloc(ho->hoAdRunHeader->rh4.rh4Mv, sizeof(WCHAR) * size);
 		}
-		mbstowcs((wchar_t*)*targetString, lua_tostring(L, 3), size);
+
+		wcsncpy_s((wchar_t*)*targetString, size, str.c_str(), size);
 	}
 	else {
+		unsigned slen = lua_objlen(L, 3);
 		if (*targetString != nullptr) {
 			*targetString = (LPSTR)mvReAlloc(ho->hoAdRunHeader->rh4.rh4Mv, *targetString, slen + 1);
 		}

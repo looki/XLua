@@ -3,12 +3,11 @@
 
 #include	<string>
 #include	<queue>
-#include	<hash_map>
+#include	<unordered_map>
 
 #include	<windows.h>
 
 #include	"lua.hpp"
-#include	"lstate.h"
 
 typedef struct tagRDATA RUNDATA;
 typedef RUNDATA* LPRDATA;
@@ -75,9 +74,9 @@ public:
 	int					stateId;
 
 	// Collection of embedded scripts keyed by script name
-	stdext::hash_map<std::string, ScriptRecord>	scripts;
+	std::unordered_map<std::string, ScriptRecord>	scripts;
 
-	typedef stdext::hash_map<std::string, ScriptRecord>::iterator	IScripts;
+	typedef std::unordered_map<std::string, ScriptRecord>::iterator	IScripts;
 
 public:
 

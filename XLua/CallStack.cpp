@@ -10,7 +10,12 @@
  */
 
 int CallStack::EventNumber () const {
-	return _state->rdList.front()->rdPtr->rHo.hoAdRunHeader->rhEventGroup->evgIdentifier;
+	auto rh = _state->rdList.front()->rdPtr->rHo.hoAdRunHeader;
+	static bool isMMF25 = (rh->rh4.rh4Mv->mvGetVersion() & MMFVERSION_MASK) == MMFVERSION_25;
+	if (isMMF25) {
+		return rh->rhEventGroup->evgInhibit;
+	}
+	return rh->rhEventGroup->evgIdentifier;
 }
 
 /**
@@ -510,7 +515,7 @@ bool CallStack::CheckPushReturn () {
 	return true;
 }
 
-extern "C" int db_errorfb (lua_State *L);
+//extern "C" int db_errorfb (lua_State *L);
 
 /**
  * LuaC_StackError is a special error handler used before invoking a Lua function in
@@ -538,8 +543,12 @@ int CallStack::LuaC_StackError (lua_State *L) {
 			if (lm->useBacktrace) {
 				// Let's be lazy about any backtrace calculations
 				if (bt.empty()) {
-					lua_pushinteger(L, 1);
-					db_errorfb(L);
+					size_t length = 0;
+					lua_tolstring(L, 1, &length);
+					std::vector<char> message(length + 1);
+					memcpy(&message[0], lua_tostring(L, 1), length);
+					lua_pop(L, 1);
+					luaL_traceback(L, L, message.data(), 1);
 					
 					std::stringstream bt_build;
 					bt_build << "Event " << state->stack.EventNumber() << ": " << lua_tostring(L, 1) << "\r\n";
