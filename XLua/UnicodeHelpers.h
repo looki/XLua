@@ -2,15 +2,24 @@
 
 #include <Windows.h>
 #include <string>
+#include "common.h"
 
-#define TSTRING std::basic_string<TCHAR>
+#ifdef FORCE_UNICODE_HELPERS
+#define UNICHAR wchar_t
+#define USE_UNICODE_HELPERS 1
+#else
+#define USE_UNICODE_HELPERS _UNICODE
+#define UNICHAR TCHAR
+#endif
+
+#define UNISTRING std::basic_string<UNICHAR>
 
 // Takes a string from a Fusion source (potentially UTF16) and converts it to UTF8 for Lua interaction.
 // (Does nothing in Non-Unicode builds)
 
 class TempLuaString {
 public:
-#ifdef UNICODE
+#if USE_UNICODE_HELPERS
 
 	TempLuaString(const wchar_t* source) {
 		int length = WideCharToMultiByte(CP_UTF8, 0, source, -1, NULL, 0, NULL, NULL);
@@ -51,7 +60,7 @@ private:
 
 class TempMMFString {
 public:
-	#ifdef UNICODE
+#if USE_UNICODE_HELPERS
 
 	TempMMFString(const char* source) {
 		int length = MultiByteToWideChar(CP_UTF8, 0, source, -1, NULL, 0);
@@ -71,7 +80,7 @@ public:
 		}
 	}
 
-	#else
+#else
 
 	TempMMFString(const char* source) : str(const_cast<char*>(source)) {}
 	TempMMFString(LPRDATA rdPtr, const std::string& source) : mmfAllocated(true) {
@@ -79,18 +88,18 @@ public:
 		memcpy(str, source.c_str(), source.size() + 1);
 	}
 
-	#endif
+#endif
 
-	const TCHAR* c_str() const {
+	const UNICHAR* c_str() const {
 		return str;
 	}
 
-	operator TSTRING() const {
-		return TSTRING(str);
+	operator UNISTRING() const {
+		return UNISTRING(str);
 	}
 
 private:
 
-	TCHAR* str;
+	UNICHAR* str;
 	bool mmfAllocated = false;
 };

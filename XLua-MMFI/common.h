@@ -110,8 +110,7 @@ typedef struct tagRV20b {
 	BYTE	rvFree2[VALUES_NUMBEROF_ALTERABLE];
 	LPSTR	rvStrings[STRINGS_NUMBEROF_ALTERABLE];
 } rVal20b;
-
-#pragma pop
+#pragma pack(pop)
 
 headerObject*			GetHO (LPRO obj);
 tagRCOM*				GetRCOM (LPHO ho);
