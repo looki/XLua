@@ -1,6 +1,7 @@
 #include "EditSetup.h"
 
 #ifndef RUN_ONLY
+
 #include "Platform.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
@@ -260,7 +261,7 @@ void InitEditor (HWND hwnd) {
 	SendMessage(hwnd, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
 #endif
 	SendMessage(hwnd, SCI_SETLEXER, SCLEX_LUA, 0);
-	SendMessage(hwnd, SCI_SETSTYLEBITS, 7, 0);
+	//SendMessage(hwnd, SCI_SETSTYLEBITS, 7, 0);
 
 	// Folding
 	SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
@@ -687,7 +688,7 @@ void EditorAutoIndent (HWND hwnd) {
 	}
 }
 
-void EditorMarginClick (Scintilla::SCNotification* notify) {
+void EditorMarginClick (SCNotification* notify) {
 	ScriptManager& sm = ScriptManager::Get();
 
 	const int lineNumber = sm.stec.SendEditor(SCI_LINEFROMPOSITION, notify->position, 0);
@@ -925,7 +926,7 @@ int EditCommand (HWND hwndDlg, WPARAM wParam, LPARAM lParam) {
 }
 
 int EditNotify (HWND hwndDlg, WPARAM wParam, LPARAM lParam) {
-	Scintilla::SCNotification* notification = (Scintilla::SCNotification*)lParam;
+	SCNotification* notification = (SCNotification*)lParam;
 
 	switch (notification->nmhdr.code) {
 

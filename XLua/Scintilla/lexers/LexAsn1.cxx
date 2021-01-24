@@ -16,7 +16,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -24,9 +23,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 // Some char test functions
 static bool isAsn1Number(int ch)
@@ -48,7 +45,7 @@ static bool isAsn1Char(int ch)
 //	Function determining the color of a given code portion
 //	Based on a "state"
 //
-static void ColouriseAsn1Doc(unsigned int startPos, int length, int initStyle, WordList *keywordLists[], Accessor &styler)
+static void ColouriseAsn1Doc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordLists[], Accessor &styler)
 {
 	// The keywords
 	WordList &Keywords = *keywordLists[0];
@@ -169,7 +166,7 @@ asn1_default:
 	sc.Complete();
 }
 
-static void FoldAsn1Doc(unsigned int, int, int, WordList *[], Accessor &styler)
+static void FoldAsn1Doc(Sci_PositionU, Sci_Position, int, WordList *[], Accessor &styler)
 {
 	// No folding enabled, no reason to continue...
 	if( styler.GetPropertyInt("fold") == 0 )
@@ -186,4 +183,4 @@ static const char * const asn1WordLists[] = {
 	0, };
 
 
-LexerModule lmAns1(SCLEX_ASN1, ColouriseAsn1Doc, "asn1", FoldAsn1Doc, asn1WordLists);
+LexerModule lmAsn1(SCLEX_ASN1, ColouriseAsn1Doc, "asn1", FoldAsn1Doc, asn1WordLists);

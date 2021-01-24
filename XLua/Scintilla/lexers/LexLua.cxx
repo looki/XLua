@@ -18,7 +18,7 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
+#include "StringCopy.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -26,9 +26,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 // Test for [=[ ... ]=] delimiters, returns 0 if it's only a [ or ],
 // return 1 for [[ or ]], returns >=2 for [=[ or ]=] and so on.
@@ -43,40 +41,45 @@ static int LongDelimCheck(StyleContext &sc) {
 }
 
 static void ColouriseLuaDoc(
-	unsigned int startPos,
-	int length,
+	Sci_PositionU startPos,
+	Sci_Position length,
 	int initStyle,
 	WordList *keywordlists[],
 	Accessor &styler) {
 
-	WordList &keywords = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2];
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
-	WordList &keywords7 = *keywordlists[6];
-	WordList &keywords8 = *keywordlists[7];
+	const WordList &keywords = *keywordlists[0];
+	const WordList &keywords2 = *keywordlists[1];
+	const WordList &keywords3 = *keywordlists[2];
+	const WordList &keywords4 = *keywordlists[3];
+	const WordList &keywords5 = *keywordlists[4];
+	const WordList &keywords6 = *keywordlists[5];
+	const WordList &keywords7 = *keywordlists[6];
+	const WordList &keywords8 = *keywordlists[7];
 
 	// Accepts accented characters
 	CharacterSet setWordStart(CharacterSet::setAlpha, "_", 0x80, true);
-	CharacterSet setWord(CharacterSet::setAlphaNum, "._", 0x80, true);
+	CharacterSet setWord(CharacterSet::setAlphaNum, "_", 0x80, true);
 	// Not exactly following number definition (several dots are seen as OK, etc.)
-	// but probably enough in most cases.
-	CharacterSet setNumber(CharacterSet::setDigits, ".-+abcdefABCDEF");
-	CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#");
+	// but probably enough in most cases. [pP] is for hex floats.
+	CharacterSet setNumber(CharacterSet::setDigits, ".-+abcdefpABCDEFP");
+	CharacterSet setExponent(CharacterSet::setNone, "eEpP");
+	CharacterSet setLuaOperator(CharacterSet::setNone, "*/-+()={}~[];<>,.^%:#&|");
 	CharacterSet setEscapeSkip(CharacterSet::setNone, "\"'\\");
 
-	int currentLine = styler.GetLine(startPos);
+	Sci_Position currentLine = styler.GetLine(startPos);
 	// Initialize long string [[ ... ]] or block comment --[[ ... ]] nesting level,
 	// if we are inside such a string. Block comment was introduced in Lua 5.0,
 	// blocks with separators [=[ ... ]=] in Lua 5.1.
+	// Continuation of a string (\z whitespace escaping) is controlled by stringWs.
 	int nestLevel = 0;
 	int sepCount = 0;
-	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT) {
-		int lineState = styler.GetLineState(currentLine - 1);
-		nestLevel = lineState >> 8;
+	int stringWs = 0;
+	if (initStyle == SCE_LUA_LITERALSTRING || initStyle == SCE_LUA_COMMENT ||
+		initStyle == SCE_LUA_STRING || initStyle == SCE_LUA_CHARACTER) {
+		const int lineState = styler.GetLineState(currentLine - 1);
+		nestLevel = lineState >> 9;
 		sepCount = lineState & 0xFF;
+		stringWs = lineState & 0x100;
 	}
 
 	// Do not leak onto next line
@@ -85,8 +88,8 @@ static void ColouriseLuaDoc(
 	}
 
 	StyleContext sc(startPos, length, initStyle, styler);
-	if (startPos == 0 && sc.ch == '#') {
-		// shbang line: # is a comment only if first char of the script
+	if (startPos == 0 && sc.ch == '#' && sc.chNext == '!') {
+		// shbang line: "#!" is a comment only if located at the start of the script
 		sc.SetState(SCE_LUA_COMMENTLINE);
 	}
 	for (; sc.More(); sc.Forward()) {
@@ -96,8 +99,10 @@ static void ColouriseLuaDoc(
 			switch (sc.state) {
 			case SCE_LUA_LITERALSTRING:
 			case SCE_LUA_COMMENT:
-				// Inside a literal string or block comment, we set the line state
-				styler.SetLineState(currentLine, (nestLevel << 8) | sepCount);
+			case SCE_LUA_STRING:
+			case SCE_LUA_CHARACTER:
+				// Inside a literal string, block comment or string, we set the line state
+				styler.SetLineState(currentLine, (nestLevel << 9) | stringWs | sepCount);
 				break;
 			default:
 				// Reset the line state
@@ -124,21 +129,74 @@ static void ColouriseLuaDoc(
 
 		// Determine if the current state should terminate.
 		if (sc.state == SCE_LUA_OPERATOR) {
+			if (sc.ch == ':' && sc.chPrev == ':') {	// :: <label> :: forward scan
+				sc.Forward();
+				Sci_Position ln = 0;
+				while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
+					ln++;
+				Sci_Position ws1 = ln;
+				if (setWordStart.Contains(sc.GetRelative(ln))) {
+					int c, i = 0;
+					char s[100];
+					while (setWord.Contains(c = sc.GetRelative(ln))) {	// get potential label
+						if (i < 90)
+							s[i++] = static_cast<char>(c);
+						ln++;
+					}
+					s[i] = '\0'; Sci_Position lbl = ln;
+					if (!keywords.InList(s)) {
+						while (IsASpaceOrTab(sc.GetRelative(ln)))	// skip over spaces/tabs
+							ln++;
+						Sci_Position ws2 = ln - lbl;
+						if (sc.GetRelative(ln) == ':' && sc.GetRelative(ln + 1) == ':') {
+							// final :: found, complete valid label construct
+							sc.ChangeState(SCE_LUA_LABEL);
+							if (ws1) {
+								sc.SetState(SCE_LUA_DEFAULT);
+								sc.ForwardBytes(ws1);
+							}
+							sc.SetState(SCE_LUA_LABEL);
+							sc.ForwardBytes(lbl - ws1);
+							if (ws2) {
+								sc.SetState(SCE_LUA_DEFAULT);
+								sc.ForwardBytes(ws2);
+							}
+							sc.SetState(SCE_LUA_LABEL);
+							sc.ForwardBytes(2);
+						}
+					}
+				}
+			}
 			sc.SetState(SCE_LUA_DEFAULT);
 		} else if (sc.state == SCE_LUA_NUMBER) {
-			// We stop the number definition on non-numerical non-dot non-eE non-sign non-hexdigit char
+			// We stop the number definition on non-numerical non-dot non-eEpP non-sign non-hexdigit char
 			if (!setNumber.Contains(sc.ch)) {
 				sc.SetState(SCE_LUA_DEFAULT);
 			} else if (sc.ch == '-' || sc.ch == '+') {
-				if (sc.chPrev != 'E' && sc.chPrev != 'e')
+				if (!setExponent.Contains(sc.chPrev))
 					sc.SetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_IDENTIFIER) {
-			if (!setWord.Contains(sc.ch) || sc.Match('.', '.')) {
+			if (!(setWord.Contains(sc.ch) || sc.ch == '.') || sc.Match('.', '.')) {
 				char s[100];
 				sc.GetCurrent(s, sizeof(s));
 				if (keywords.InList(s)) {
 					sc.ChangeState(SCE_LUA_WORD);
+					if (strcmp(s, "goto") == 0) {	// goto <label> forward scan
+						sc.SetState(SCE_LUA_DEFAULT);
+						while (IsASpaceOrTab(sc.ch) && !sc.atLineEnd)
+							sc.Forward();
+						if (setWordStart.Contains(sc.ch)) {
+							sc.SetState(SCE_LUA_LABEL);
+							sc.Forward();
+							while (setWord.Contains(sc.ch))
+								sc.Forward();
+							sc.GetCurrent(s, sizeof(s));
+							if (keywords.InList(s))
+								sc.ChangeState(SCE_LUA_WORD);
+						}
+						sc.SetState(SCE_LUA_DEFAULT);
+					}
 				} else if (keywords2.InList(s)) {
 					sc.ChangeState(SCE_LUA_WORD2);
 				} else if (keywords3.InList(s)) {
@@ -161,30 +219,44 @@ static void ColouriseLuaDoc(
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_STRING) {
+			if (stringWs) {
+				if (!IsASpace(sc.ch))
+					stringWs = 0;
+			}
 			if (sc.ch == '\\') {
 				if (setEscapeSkip.Contains(sc.chNext)) {
 					sc.Forward();
+				} else if (sc.chNext == 'z') {
+					sc.Forward();
+					stringWs = 0x100;
 				}
 			} else if (sc.ch == '\"') {
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
-			} else if (sc.atLineEnd) {
+			} else if (stringWs == 0 && sc.atLineEnd) {
 				sc.ChangeState(SCE_LUA_STRINGEOL);
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_CHARACTER) {
+			if (stringWs) {
+				if (!IsASpace(sc.ch))
+					stringWs = 0;
+			}
 			if (sc.ch == '\\') {
 				if (setEscapeSkip.Contains(sc.chNext)) {
 					sc.Forward();
+				} else if (sc.chNext == 'z') {
+					sc.Forward();
+					stringWs = 0x100;
 				}
 			} else if (sc.ch == '\'') {
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
-			} else if (sc.atLineEnd) {
+			} else if (stringWs == 0 && sc.atLineEnd) {
 				sc.ChangeState(SCE_LUA_STRINGEOL);
 				sc.ForwardSetState(SCE_LUA_DEFAULT);
 			}
 		} else if (sc.state == SCE_LUA_LITERALSTRING || sc.state == SCE_LUA_COMMENT) {
 			if (sc.ch == '[') {
-				int sep = LongDelimCheck(sc);
+				const int sep = LongDelimCheck(sc);
 				if (sep == 1 && sepCount == 1) {    // [[-only allowed to nest
 					nestLevel++;
 					sc.Forward();
@@ -215,8 +287,10 @@ static void ColouriseLuaDoc(
 				sc.SetState(SCE_LUA_IDENTIFIER);
 			} else if (sc.ch == '\"') {
 				sc.SetState(SCE_LUA_STRING);
+				stringWs = 0;
 			} else if (sc.ch == '\'') {
 				sc.SetState(SCE_LUA_CHARACTER);
+				stringWs = 0;
 			} else if (sc.ch == '[') {
 				sepCount = LongDelimCheck(sc);
 				if (sepCount == 0) {
@@ -247,7 +321,7 @@ static void ColouriseLuaDoc(
 		}
 	}
 
-	if (setWord.Contains(sc.chPrev)) {
+	if (setWord.Contains(sc.chPrev) || sc.chPrev == '.') {
 		char s[100];
 		sc.GetCurrent(s, sizeof(s));
 		if (keywords.InList(s)) {
@@ -272,27 +346,27 @@ static void ColouriseLuaDoc(
 	sc.Complete();
 }
 
-static void FoldLuaDoc(unsigned int startPos, int length, int /* initStyle */, WordList *[],
+static void FoldLuaDoc(Sci_PositionU startPos, Sci_Position length, int /* initStyle */, WordList *[],
                        Accessor &styler) {
-	unsigned int lengthDoc = startPos + length;
+	const Sci_PositionU lengthDoc = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelPrev = styler.LevelAt(lineCurrent) & SC_FOLDLEVELNUMBERMASK;
 	int levelCurrent = levelPrev;
 	char chNext = styler[startPos];
-	bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
+	const bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	int styleNext = styler.StyleAt(startPos);
-	char s[10];
 
-	for (unsigned int i = startPos; i < lengthDoc; i++) {
-		char ch = chNext;
+	for (Sci_PositionU i = startPos; i < lengthDoc; i++) {
+		const char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
-		int style = styleNext;
+		const int style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
-		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
+		const bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
 		if (style == SCE_LUA_WORD) {
 			if (ch == 'i' || ch == 'd' || ch == 'f' || ch == 'e' || ch == 'r' || ch == 'u') {
-				for (unsigned int j = 0; j < 8; j++) {
+				char s[10] = "";
+				for (Sci_PositionU j = 0; j < 8; j++) {
 					if (!iswordchar(styler[i + j])) {
 						break;
 					}
@@ -358,4 +432,33 @@ static const char * const luaWordListDesc[] = {
 	0
 };
 
-LexerModule lmLua(SCLEX_LUA, ColouriseLuaDoc, "lua", FoldLuaDoc, luaWordListDesc);
+namespace {
+
+LexicalClass lexicalClasses[] = {
+	// Lexer Lua SCLEX_LUA SCE_LUA_:
+	0, "SCE_LUA_DEFAULT", "default", "White space: Visible only in View Whitespace mode (or if it has a back colour)",
+	1, "SCE_LUA_COMMENT", "comment", "Block comment (Lua 5.0)",
+	2, "SCE_LUA_COMMENTLINE", "comment line", "Line comment",
+	3, "SCE_LUA_COMMENTDOC", "comment documentation", "Doc comment -- Not used in Lua (yet?)",
+	4, "SCE_LUA_NUMBER", "literal numeric", "Number",
+	5, "SCE_LUA_WORD", "keyword", "Keyword",
+	6, "SCE_LUA_STRING", "literal string", "(Double quoted) String",
+	7, "SCE_LUA_CHARACTER", "literal string character", "Character (Single quoted string)",
+	8, "SCE_LUA_LITERALSTRING", "literal string", "Literal string",
+	9, "SCE_LUA_PREPROCESSOR", "preprocessor", "Preprocessor (obsolete in Lua 4.0 and up)",
+	10, "SCE_LUA_OPERATOR", "operator", "Operators",
+	11, "SCE_LUA_IDENTIFIER", "identifier", "Identifier (everything else...)",
+	12, "SCE_LUA_STRINGEOL", "error literal string", "End of line where string is not closed",
+	13, "SCE_LUA_WORD2", "identifier", "Other keywords",
+	14, "SCE_LUA_WORD3", "identifier", "Other keywords",
+	15, "SCE_LUA_WORD4", "identifier", "Other keywords",
+	16, "SCE_LUA_WORD5", "identifier", "Other keywords",
+	17, "SCE_LUA_WORD6", "identifier", "Other keywords",
+	18, "SCE_LUA_WORD7", "identifier", "Other keywords",
+	19, "SCE_LUA_WORD8", "identifier", "Other keywords",
+	20, "SCE_LUA_LABEL", "label", "Labels",
+};
+
+}
+
+LexerModule lmLua(SCLEX_LUA, ColouriseLuaDoc, "lua", FoldLuaDoc, luaWordListDesc, lexicalClasses, ELEMENTS(lexicalClasses));

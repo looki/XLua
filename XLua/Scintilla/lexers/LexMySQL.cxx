@@ -3,7 +3,7 @@
  * @file LexMySQL.cxx
  * Lexer for MySQL
  *
- * Improved by Mike Lischke <mike.lischke@sun.com>
+ * Improved by Mike Lischke <mike.lischke@oracle.com>
  * Adopted from LexSQL.cxx by Anders Karlsson <anders@mysql.com>
  * Original work by Neil Hodgson <neilh@scintilla.org>
  * Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
@@ -21,7 +21,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -29,9 +28,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsAWordChar(int ch) {
 	return (ch < 0x80) && (isalnum(ch) || ch == '_');
@@ -39,13 +36,6 @@ static inline bool IsAWordChar(int ch) {
 
 static inline bool IsAWordStart(int ch) {
 	return (ch < 0x80) && (isalpha(ch) || ch == '_');
-}
-
-static inline bool IsADoxygenChar(int ch) {
-	return (islower(ch) || ch == '$' || ch == '@' ||
-	        ch == '\\' || ch == '&' || ch == '<' ||
-	        ch == '>' || ch == '#' || ch == '{' ||
-	        ch == '}' || ch == '[' || ch == ']');
 }
 
 static inline bool IsANumberChar(int ch) {
@@ -61,88 +51,113 @@ static inline bool IsANumberChar(int ch) {
 /**
  * Check if the current content context represent a keyword and set the context state if so.
  */
-static void CheckForKeyword(StyleContext& sc, WordList* keywordlists[])
+static void CheckForKeyword(StyleContext& sc, WordList* keywordlists[], int activeState)
 {
-  int length = sc.LengthCurrent() + 1; // +1 for the next char
+  Sci_Position length = sc.LengthCurrent() + 1; // +1 for the next char
   char* s = new char[length];
   sc.GetCurrentLowered(s, length);
   if (keywordlists[0]->InList(s))
-    sc.ChangeState(SCE_MYSQL_MAJORKEYWORD);
+    sc.ChangeState(SCE_MYSQL_MAJORKEYWORD | activeState);
   else
     if (keywordlists[1]->InList(s))
-      sc.ChangeState(SCE_MYSQL_KEYWORD);
+      sc.ChangeState(SCE_MYSQL_KEYWORD | activeState);
     else
       if (keywordlists[2]->InList(s))
-        sc.ChangeState(SCE_MYSQL_DATABASEOBJECT);
+        sc.ChangeState(SCE_MYSQL_DATABASEOBJECT | activeState);
       else
         if (keywordlists[3]->InList(s))
-          sc.ChangeState(SCE_MYSQL_FUNCTION);
+          sc.ChangeState(SCE_MYSQL_FUNCTION | activeState);
         else
           if (keywordlists[5]->InList(s))
-            sc.ChangeState(SCE_MYSQL_PROCEDUREKEYWORD);
+            sc.ChangeState(SCE_MYSQL_PROCEDUREKEYWORD | activeState);
           else
             if (keywordlists[6]->InList(s))
-              sc.ChangeState(SCE_MYSQL_USER1);
+              sc.ChangeState(SCE_MYSQL_USER1 | activeState);
             else
               if (keywordlists[7]->InList(s))
-                sc.ChangeState(SCE_MYSQL_USER2);
+                sc.ChangeState(SCE_MYSQL_USER2 | activeState);
               else
                 if (keywordlists[8]->InList(s))
-                  sc.ChangeState(SCE_MYSQL_USER3);
+                  sc.ChangeState(SCE_MYSQL_USER3 | activeState);
   delete [] s;
 }
 
 //--------------------------------------------------------------------------------------------------
 
-static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, WordList *keywordlists[],
+#define HIDDENCOMMAND_STATE 0x40 // Offset for states within a hidden command.
+#define MASKACTIVE(style) (style & ~HIDDENCOMMAND_STATE)
+
+static void SetDefaultState(StyleContext& sc, int activeState)
+{
+  if (activeState == 0)
+    sc.SetState(SCE_MYSQL_DEFAULT);
+  else
+    sc.SetState(SCE_MYSQL_HIDDENCOMMAND);
+}
+
+static void ForwardDefaultState(StyleContext& sc, int activeState)
+{
+  if (activeState == 0)
+    sc.ForwardSetState(SCE_MYSQL_DEFAULT);
+  else
+    sc.ForwardSetState(SCE_MYSQL_HIDDENCOMMAND);
+}
+
+static void ColouriseMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *keywordlists[],
                             Accessor &styler)
 {
-	StyleContext sc(startPos, length, initStyle, styler);
+	StyleContext sc(startPos, length, initStyle, styler, 127);
+  int activeState = (initStyle == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : initStyle & HIDDENCOMMAND_STATE;
 
 	for (; sc.More(); sc.Forward())
   {
 		// Determine if the current state should terminate.
-		switch (sc.state)
+		switch (MASKACTIVE(sc.state))
     {
       case SCE_MYSQL_OPERATOR:
-        sc.SetState(SCE_MYSQL_DEFAULT);
+        SetDefaultState(sc, activeState);
         break;
       case SCE_MYSQL_NUMBER:
         // We stop the number definition on non-numerical non-dot non-eE non-sign char.
         if (!IsANumberChar(sc.ch))
-          sc.SetState(SCE_MYSQL_DEFAULT);
+          SetDefaultState(sc, activeState);
         break;
       case SCE_MYSQL_IDENTIFIER:
         // Switch from identifier to keyword state and open a new state for the new char.
         if (!IsAWordChar(sc.ch))
         {
-          CheckForKeyword(sc, keywordlists);
+          CheckForKeyword(sc, keywordlists, activeState);
 
           // Additional check for function keywords needed.
           // A function name must be followed by an opening parenthesis.
-          if (sc.state == SCE_MYSQL_FUNCTION && sc.ch != '(')
-            sc.ChangeState(SCE_MYSQL_DEFAULT);
+          if (MASKACTIVE(sc.state) == SCE_MYSQL_FUNCTION && sc.ch != '(')
+          {
+            if (activeState > 0)
+              sc.ChangeState(SCE_MYSQL_HIDDENCOMMAND);
+            else
+              sc.ChangeState(SCE_MYSQL_DEFAULT);
+          }
 
-          sc.SetState(SCE_MYSQL_DEFAULT);
+          SetDefaultState(sc, activeState);
         }
         break;
       case SCE_MYSQL_VARIABLE:
         if (!IsAWordChar(sc.ch))
-          sc.SetState(SCE_MYSQL_DEFAULT);
+          SetDefaultState(sc, activeState);
         break;
       case SCE_MYSQL_SYSTEMVARIABLE:
         if (!IsAWordChar(sc.ch))
         {
-          int length = sc.LengthCurrent() + 1;
+          Sci_Position length = sc.LengthCurrent() + 1;
           char* s = new char[length];
           sc.GetCurrentLowered(s, length);
 
           // Check for known system variables here.
           if (keywordlists[4]->InList(&s[2]))
-            sc.ChangeState(SCE_MYSQL_KNOWNSYSTEMVARIABLE);
+            sc.ChangeState(SCE_MYSQL_KNOWNSYSTEMVARIABLE | activeState);
           delete [] s;
 
-          sc.SetState(SCE_MYSQL_DEFAULT);
+          SetDefaultState(sc, activeState);
         }
         break;
       case SCE_MYSQL_QUOTEDIDENTIFIER:
@@ -151,20 +166,19 @@ static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, 
           if (sc.chNext == '`')
             sc.Forward();	// Ignore it
           else
-            sc.ForwardSetState(SCE_MYSQL_DEFAULT);
+            ForwardDefaultState(sc, activeState);
 				}
   			break;
       case SCE_MYSQL_COMMENT:
-      case SCE_MYSQL_HIDDENCOMMAND:
         if (sc.Match('*', '/'))
         {
           sc.Forward();
-          sc.ForwardSetState(SCE_MYSQL_DEFAULT);
+          ForwardDefaultState(sc, activeState);
         }
         break;
       case SCE_MYSQL_COMMENTLINE:
         if (sc.atLineStart)
-          sc.SetState(SCE_MYSQL_DEFAULT);
+          SetDefaultState(sc, activeState);
         break;
       case SCE_MYSQL_SQSTRING:
         if (sc.ch == '\\')
@@ -176,7 +190,7 @@ static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, 
             if (sc.chNext == '\'')
               sc.Forward();
             else
-              sc.ForwardSetState(SCE_MYSQL_DEFAULT);
+              ForwardDefaultState(sc, activeState);
           }
         break;
       case SCE_MYSQL_DQSTRING:
@@ -189,76 +203,97 @@ static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, 
             if (sc.chNext == '\"')
               sc.Forward();
             else
-              sc.ForwardSetState(SCE_MYSQL_DEFAULT);
+              ForwardDefaultState(sc, activeState);
           }
+        break;
+      case SCE_MYSQL_PLACEHOLDER:
+        if (sc.Match('}', '>'))
+        {
+          sc.Forward();
+          ForwardDefaultState(sc, activeState);
+        }
         break;
     }
 
+    if (sc.state == SCE_MYSQL_HIDDENCOMMAND && sc.Match('*', '/'))
+    {
+      activeState = 0;
+      sc.Forward();
+      ForwardDefaultState(sc, activeState);
+    }
+
     // Determine if a new state should be entered.
-    if (sc.state == SCE_MYSQL_DEFAULT)
+    if (sc.state == SCE_MYSQL_DEFAULT || sc.state == SCE_MYSQL_HIDDENCOMMAND)
     {
       switch (sc.ch)
       {
         case '@':
           if (sc.chNext == '@')
           {
-            sc.SetState(SCE_MYSQL_SYSTEMVARIABLE);
+            sc.SetState(SCE_MYSQL_SYSTEMVARIABLE | activeState);
             sc.Forward(2); // Skip past @@.
           }
           else
             if (IsAWordStart(sc.ch))
             {
-              sc.SetState(SCE_MYSQL_VARIABLE);
+              sc.SetState(SCE_MYSQL_VARIABLE | activeState);
               sc.Forward(); // Skip past @.
             }
             else
-              sc.SetState(SCE_MYSQL_OPERATOR);
+              sc.SetState(SCE_MYSQL_OPERATOR | activeState);
           break;
         case '`':
-          sc.SetState(SCE_MYSQL_QUOTEDIDENTIFIER);
+          sc.SetState(SCE_MYSQL_QUOTEDIDENTIFIER | activeState);
           break;
         case '#':
-          sc.SetState(SCE_MYSQL_COMMENTLINE);
+          sc.SetState(SCE_MYSQL_COMMENTLINE | activeState);
           break;
         case '\'':
-          sc.SetState(SCE_MYSQL_SQSTRING);
+          sc.SetState(SCE_MYSQL_SQSTRING | activeState);
           break;
         case '\"':
-          sc.SetState(SCE_MYSQL_DQSTRING);
+          sc.SetState(SCE_MYSQL_DQSTRING | activeState);
           break;
         default:
           if (IsADigit(sc.ch) || (sc.ch == '.' && IsADigit(sc.chNext)))
-            sc.SetState(SCE_MYSQL_NUMBER);
+            sc.SetState(SCE_MYSQL_NUMBER | activeState);
           else
             if (IsAWordStart(sc.ch))
-              sc.SetState(SCE_MYSQL_IDENTIFIER);
+              sc.SetState(SCE_MYSQL_IDENTIFIER | activeState);
             else
               if (sc.Match('/', '*'))
               {
-                sc.SetState(SCE_MYSQL_COMMENT);
+                sc.SetState(SCE_MYSQL_COMMENT | activeState);
 
-                // Skip comment introducer and check for hidden command.
-                sc.Forward(2);
-                if (sc.ch == '!')
+                // Skip first char of comment introducer and check for hidden command.
+                // The second char is skipped by the outer loop.
+                sc.Forward();
+                if (sc.GetRelativeCharacter(1) == '!')
                 {
-                  sc.ChangeState(SCE_MYSQL_HIDDENCOMMAND);
+                  // Version comment found. Skip * now.
                   sc.Forward();
+                  activeState = HIDDENCOMMAND_STATE;
+                  sc.ChangeState(SCE_MYSQL_HIDDENCOMMAND);
                 }
+              }
+              else if (sc.Match('<', '{'))
+              {
+                sc.SetState(SCE_MYSQL_PLACEHOLDER | activeState);
               }
               else
                 if (sc.Match("--"))
                 {
                   // Special MySQL single line comment.
-                  sc.SetState(SCE_MYSQL_COMMENTLINE);
+                  sc.SetState(SCE_MYSQL_COMMENTLINE | activeState);
                   sc.Forward(2);
 
                   // Check the third character too. It must be a space or EOL.
                   if (sc.ch != ' ' && sc.ch != '\n' && sc.ch != '\r')
-                    sc.ChangeState(SCE_MYSQL_OPERATOR);
+                    sc.ChangeState(SCE_MYSQL_OPERATOR | activeState);
                 }
                 else
                   if (isoperator(static_cast<char>(sc.ch)))
-                    sc.SetState(SCE_MYSQL_OPERATOR);
+                    sc.SetState(SCE_MYSQL_OPERATOR | activeState);
       }
     }
   }
@@ -267,12 +302,12 @@ static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, 
   // also at the end of a line.
   if (sc.state == SCE_MYSQL_IDENTIFIER)
   {
-    CheckForKeyword(sc, keywordlists);
+    CheckForKeyword(sc, keywordlists, activeState);
 
     // Additional check for function keywords needed.
     // A function name must be followed by an opening parenthesis.
     if (sc.state == SCE_MYSQL_FUNCTION && sc.ch != '(')
-      sc.ChangeState(SCE_MYSQL_DEFAULT);
+      SetDefaultState(sc, activeState);
   }
 
   sc.Complete();
@@ -285,7 +320,7 @@ static void ColouriseMySQLDoc(unsigned int startPos, int length, int initStyle, 
  */
 static bool IsStreamCommentStyle(int style)
 {
-	return style == SCE_MYSQL_COMMENT;
+	return MASKACTIVE(style) == SCE_MYSQL_COMMENT;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -294,9 +329,9 @@ static bool IsStreamCommentStyle(int style)
  * Code copied from StyleContext and modified to work here. Should go into Accessor as a
  * companion to Match()...
  */
-bool MatchIgnoreCase(Accessor &styler, int currentPos, const char *s)
+static bool MatchIgnoreCase(Accessor &styler, Sci_Position currentPos, const char *s)
 {
-  for (int n = 0; *s; n++)
+  for (Sci_Position n = 0; *s; n++)
   {
     if (*s != tolower(styler.SafeGetCharAt(currentPos + n)))
       return false;
@@ -309,14 +344,14 @@ bool MatchIgnoreCase(Accessor &styler, int currentPos, const char *s)
 
 // Store both the current line's fold level and the next lines in the
 // level store to make it easy to pick up with each increment.
-static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordList *[], Accessor &styler)
+static void FoldMySQLDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *[], Accessor &styler)
 {
 	bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
 	bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 	bool foldOnlyBegin = styler.GetPropertyInt("fold.sql.only.begin", 0) != 0;
 
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent - 1) >> 16;
@@ -324,39 +359,33 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
 
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
+  int activeState = (style == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : style & HIDDENCOMMAND_STATE;
 
-  bool endFound = false;
-	bool whenFound = false;
-	bool elseFound = false;
+  bool endPending = false;
+	bool whenPending = false;
+	bool elseIfPending = false;
 
   char nextChar = styler.SafeGetCharAt(startPos);
-  for (unsigned int i = startPos; length > 0; i++, length--)
+  for (Sci_PositionU i = startPos; length > 0; i++, length--)
   {
 		int stylePrev = style;
+    int lastActiveState = activeState;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
+    activeState = (style == SCE_MYSQL_HIDDENCOMMAND) ? HIDDENCOMMAND_STATE : style & HIDDENCOMMAND_STATE;
 
     char currentChar = nextChar;
     nextChar = styler.SafeGetCharAt(i + 1);
 		bool atEOL = (currentChar == '\r' && nextChar != '\n') || (currentChar == '\n');
 
-    switch (style)
+    switch (MASKACTIVE(style))
     {
       case SCE_MYSQL_COMMENT:
         if (foldComment)
         {
-          // Multiline comment style /* .. */.
-          if (IsStreamCommentStyle(style))
-          {
-            // Increase level if we just start a foldable comment.
-            if (!IsStreamCommentStyle(stylePrev))
-              levelNext++;
-            else
-              // If we are in the middle of a foldable comment check if it ends now.
-              // Don't end at the line end, though.
-              if (!IsStreamCommentStyle(styleNext) && !atEOL)
-                levelNext--;
-          }
+          // Multiline comment style /* .. */ just started or is still in progress.
+          if (IsStreamCommentStyle(style) && !IsStreamCommentStyle(stylePrev))
+            levelNext++;
         }
         break;
       case SCE_MYSQL_COMMENTLINE:
@@ -378,18 +407,37 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
         }
         break;
       case SCE_MYSQL_HIDDENCOMMAND:
-        if (style != stylePrev)
+        /*
+        if (endPending)
+        {
+          // A conditional command is not a white space so it should end the current block
+          // before opening a new one.
+          endPending = false;
+          levelNext--;
+          if (levelNext < SC_FOLDLEVELBASE)
+            levelNext = SC_FOLDLEVELBASE;
+        }
+        }*/
+        if (activeState != lastActiveState)
           levelNext++;
-        else
-          if (style != styleNext)
-            levelNext--;
         break;
       case SCE_MYSQL_OPERATOR:
+        if (endPending)
+        {
+          endPending = false;
+          levelNext--;
+          if (levelNext < SC_FOLDLEVELBASE)
+            levelNext = SC_FOLDLEVELBASE;
+        }
         if (currentChar == '(')
           levelNext++;
         else
           if (currentChar == ')')
+          {
             levelNext--;
+            if (levelNext < SC_FOLDLEVELBASE)
+              levelNext = SC_FOLDLEVELBASE;
+          }
         break;
       case SCE_MYSQL_MAJORKEYWORD:
       case SCE_MYSQL_KEYWORD:
@@ -398,110 +446,114 @@ static void FoldMySQLDoc(unsigned int startPos, int length, int initStyle, WordL
         // Reserved and other keywords.
         if (style != stylePrev)
         {
-          bool beginFound = MatchIgnoreCase(styler, i, "begin");
-          bool ifFound = MatchIgnoreCase(styler, i, "if");
-          bool thenFound = MatchIgnoreCase(styler, i, "then");
-          bool whileFound = MatchIgnoreCase(styler, i, "while");
-          bool loopFound = MatchIgnoreCase(styler, i, "loop");
-          bool repeatFound = MatchIgnoreCase(styler, i, "repeat");
-
-          if (!foldOnlyBegin && endFound && (ifFound || whileFound || loopFound))
+          // END decreases the folding level, regardless which keyword follows.
+          bool endFound = MatchIgnoreCase(styler, i, "end");
+          if (endPending)
           {
-            endFound = false;
             levelNext--;
             if (levelNext < SC_FOLDLEVELBASE)
               levelNext = SC_FOLDLEVELBASE;
-
-            // Note that "else" is special here. It may or may not be followed by an "if .. then",
-            // but in any case the level stays the same. When followed by an "if .. then" the level
-            // will be increased later, if not, then at eol.
           }
           else
-            if (!foldOnlyBegin && MatchIgnoreCase(styler, i, "else"))
+            if (!endFound)
             {
-              levelNext--;
-              elseFound = true;
-            }
-            else
-              if (!foldOnlyBegin && thenFound)
-              {
-                if (whenFound)
-                  whenFound = false;
-                else
-                  levelNext++;
-              }
+              if (MatchIgnoreCase(styler, i, "begin"))
+                levelNext++;
               else
-                if (ifFound)
-                  elseFound = false;
-                else
-                  if (MatchIgnoreCase(styler, i, "when"))
-                    whenFound = true;
+              {
+                if (!foldOnlyBegin)
+                {
+                  bool whileFound = MatchIgnoreCase(styler, i, "while");
+                  bool loopFound = MatchIgnoreCase(styler, i, "loop");
+                  bool repeatFound = MatchIgnoreCase(styler, i, "repeat");
+                  bool caseFound = MatchIgnoreCase(styler, i, "case");
+
+                  if (whileFound || loopFound || repeatFound || caseFound)
+                    levelNext++;
                   else
                   {
-                    if (beginFound)
-                      levelNext++;
-                    else
-                      if (!foldOnlyBegin && (loopFound || repeatFound || whileFound))
-                      {
-                        if (endFound)
-                          endFound = false;
-                        else
-                          levelNext++;
-                      }
+                    // IF alone does not increase the fold level as it is also used in non-block'ed
+                    // code like DROP PROCEDURE blah IF EXISTS.
+                    // Instead THEN opens the new level (if not part of an ELSEIF or WHEN (case) branch).
+                    if (MatchIgnoreCase(styler, i, "then"))
+                    {
+                      if (!elseIfPending && !whenPending)
+                        levelNext++;
                       else
-                        if (MatchIgnoreCase(styler, i, "end"))
-                        {
-                          // Multiple "end" in a row are counted multiple times!
-                          if (endFound)
-                          {
-                            levelNext--;
-                            if (levelNext < SC_FOLDLEVELBASE)
-                              levelNext = SC_FOLDLEVELBASE;
-                          }
-                          endFound = true;
-                          whenFound = false;
-                        }
+                      {
+                        elseIfPending = false;
+                        whenPending = false;
+                      }
+                    }
+                    else
+                    {
+                      // Neither of if/then/while/loop/repeat/case, so check for
+                      // sub parts of IF and CASE.
+                      if (MatchIgnoreCase(styler, i, "elseif"))
+                        elseIfPending = true;
+                      if (MatchIgnoreCase(styler, i, "when"))
+                        whenPending = true;
+                    }
                   }
+                }
+              }
+            }
+
+          // Keep the current end state for the next round.
+          endPending = endFound;
+        }
+        break;
+
+      default:
+        if (!isspacechar(currentChar) && endPending)
+        {
+          // END followed by a non-whitespace character (not covered by other cases like identifiers)
+          // also should end a folding block. Typical case: END followed by self defined delimiter.
+          levelNext--;
+          if (levelNext < SC_FOLDLEVELBASE)
+            levelNext = SC_FOLDLEVELBASE;
         }
         break;
     }
 
-    // Handle the case of a trailing end without an if / while etc, as in the case of a begin.
-		if (endFound)
+    // Go up one level if we just ended a multi line comment.
+    if (IsStreamCommentStyle(stylePrev) && !IsStreamCommentStyle(style))
     {
-			endFound = false;
-			levelNext--;
-			if (levelNext < SC_FOLDLEVELBASE)
+      levelNext--;
+      if (levelNext < SC_FOLDLEVELBASE)
         levelNext = SC_FOLDLEVELBASE;
-		}
+    }
 
-		if (atEOL)
+    if (activeState == 0 && lastActiveState != 0)
     {
-			if (elseFound)
-      {
-				levelNext++;
-        elseFound = false;
-      }
+      // Decrease fold level when we left a hidden command.
+      levelNext--;
+      if (levelNext < SC_FOLDLEVELBASE)
+        levelNext = SC_FOLDLEVELBASE;
+    }
 
-			int levelUse = levelCurrent;
-			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
-				lev |= SC_FOLDLEVELWHITEFLAG;
-			if (levelUse < levelNext)
-				lev |= SC_FOLDLEVELHEADERFLAG;
-			if (lev != styler.LevelAt(lineCurrent))
-				styler.SetLevel(lineCurrent, lev);
+    if (atEOL)
+    {
+      // Apply the new folding level to this line.
+      // Leave pending states as they are otherwise a line break will de-sync
+      // code folding and valid syntax.
+      int levelUse = levelCurrent;
+      int lev = levelUse | levelNext << 16;
+      if (visibleChars == 0 && foldCompact)
+        lev |= SC_FOLDLEVELWHITEFLAG;
+      if (levelUse < levelNext)
+        lev |= SC_FOLDLEVELHEADERFLAG;
+      if (lev != styler.LevelAt(lineCurrent))
+        styler.SetLevel(lineCurrent, lev);
 
-			lineCurrent++;
-			levelCurrent = levelNext;
-			visibleChars = 0;
-			endFound = false;
-			whenFound = false;
-		}
+      lineCurrent++;
+      levelCurrent = levelNext;
+      visibleChars = 0;
+    }
 
 		if (!isspacechar(currentChar))
-			visibleChars++;
-	}
+      visibleChars++;
+  }
 }
 
 //--------------------------------------------------------------------------------------------------

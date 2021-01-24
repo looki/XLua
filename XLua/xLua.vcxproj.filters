@@ -75,7 +75,19 @@
     <ClCompile Include="XLuaState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scintilla\lexlib\Accessor.cxx">
+    <ClCompile Include="LuaJIT-2.0.5\src\xlua.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\CheckD2D.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\HanjaDic.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\PlatWin.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\win32\ScintillaWin.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\AutoComplete.cxx">
@@ -84,13 +96,16 @@
     <ClCompile Include="Scintilla\src\CallTip.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
+    <ClCompile Include="Scintilla\src\CaseConvert.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\CaseFolder.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
     <ClCompile Include="Scintilla\src\Catalogue.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\CellBuffer.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\lexlib\CharacterSet.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\CharClassify.cxx">
@@ -99,13 +114,22 @@
     <ClCompile Include="Scintilla\src\ContractionState.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
+    <ClCompile Include="Scintilla\src\DBCS.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
     <ClCompile Include="Scintilla\src\Decoration.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\Document.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
+    <ClCompile Include="Scintilla\src\EditModel.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
     <ClCompile Include="Scintilla\src\Editor.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\EditView.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\ExternalLexer.cxx">
@@ -115,6 +139,54 @@
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\src\KeyMap.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\LineMarker.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\MarginView.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\PerLine.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\PositionCache.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\RESearch.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\RunStyles.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ScintillaBase.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Selection.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\Style.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\UniConversion.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\ViewStyle.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\src\XPM.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\Accessor.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\CharacterCategory.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\CharacterSet.cxx">
+      <Filter>Source Files\Scintilla</Filter>
+    </ClCompile>
+    <ClCompile Include="Scintilla\lexlib\DefaultLexer.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\lexlib\LexerBase.cxx">
@@ -129,59 +201,17 @@
     <ClCompile Include="Scintilla\lexlib\LexerSimple.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
-    <ClCompile Include="Scintilla\lexers\LexLua.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\LineMarker.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\PerLine.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\win32\PlatWin.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\PositionCache.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
     <ClCompile Include="Scintilla\lexlib\PropSetSimple.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\RESearch.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\RunStyles.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\ScintillaBase.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\win32\ScintillaWin.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\Selection.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\Style.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
     <ClCompile Include="Scintilla\lexlib\StyleContext.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
-    <ClCompile Include="Scintilla\src\UniConversion.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="Scintilla\src\ViewStyle.cxx">
-      <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
     <ClCompile Include="Scintilla\lexlib\WordList.cxx">
       <Filter>Source Files\Scintilla</Filter>
     </ClCompile>
-    <ClCompile Include="Scintilla\src\XPM.cxx">
+    <ClCompile Include="Scintilla\lexers\LexLua.cxx">
       <Filter>Source Files\Scintilla</Filter>
-    </ClCompile>
-    <ClCompile Include="LuaJIT-2.0.5\src\xlua.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

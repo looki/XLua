@@ -2,6 +2,7 @@
  ** Lexer for D.
  **
  ** Copyright (c) 2006 by Waldemar Augustyn <waldemar@wdmsys.com>
+ ** Converted to lexer object and added further folding features/properties by "Udo Lechner" <dlchnr(at)gmx(dot)net>
  **/
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
 // The License.txt file describes the conditions under which this software may be distributed.
@@ -13,21 +14,22 @@
 #include <assert.h>
 #include <ctype.h>
 
+#include <string>
+#include <map>
+
 #include "ILexer.h"
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
-#include "Accessor.h"
 #include "StyleContext.h"
 #include "CharacterSet.h"
 #include "LexerModule.h"
+#include "OptionSet.h"
+#include "DefaultLexer.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 /* Nested comments require keeping the value of the nesting level for every
    position in the document.  But since scintilla always styles line by line,
@@ -38,15 +40,15 @@ using namespace Scintilla;
 // Underscore, letter, digit and universal alphas from C99 Appendix D.
 
 static bool IsWordStart(int ch) {
-	return (isascii(ch) && (isalpha(ch) || ch == '_')) || !isascii(ch);
+	return (IsASCII(ch) && (isalpha(ch) || ch == '_')) || !IsASCII(ch);
 }
 
 static bool IsWord(int ch) {
-	return (isascii(ch) && (isalnum(ch) || ch == '_')) || !isascii(ch);
+	return (IsASCII(ch) && (isalnum(ch) || ch == '_')) || !IsASCII(ch);
 }
 
 static bool IsDoxygen(int ch) {
-	if (isascii(ch) && islower(ch))
+	if (IsASCII(ch) && islower(ch))
 		return true;
 	if (ch == '$' || ch == '@' || ch == '\\' ||
 		ch == '&' || ch == '#' || ch == '<' || ch == '>' ||
@@ -59,23 +61,193 @@ static bool IsStringSuffix(int ch) {
 	return ch == 'c' || ch == 'w' || ch == 'd';
 }
 
+static bool IsStreamCommentStyle(int style) {
+	return style == SCE_D_COMMENT ||
+		style == SCE_D_COMMENTDOC ||
+		style == SCE_D_COMMENTDOCKEYWORD ||
+		style == SCE_D_COMMENTDOCKEYWORDERROR;
+}
 
-static void ColouriseDoc(unsigned int startPos, int length, int initStyle,
-	WordList *keywordlists[], Accessor &styler, bool caseSensitive) {
+// An individual named option for use in an OptionSet
 
-	WordList &keywords  = *keywordlists[0];
-	WordList &keywords2 = *keywordlists[1];
-	WordList &keywords3 = *keywordlists[2]; //doxygen
-	WordList &keywords4 = *keywordlists[3];
-	WordList &keywords5 = *keywordlists[4];
-	WordList &keywords6 = *keywordlists[5];
-	WordList &keywords7 = *keywordlists[6];
+// Options used for LexerD
+struct OptionsD {
+	bool fold;
+	bool foldSyntaxBased;
+	bool foldComment;
+	bool foldCommentMultiline;
+	bool foldCommentExplicit;
+	std::string foldExplicitStart;
+	std::string foldExplicitEnd;
+	bool foldExplicitAnywhere;
+	bool foldCompact;
+	int  foldAtElseInt;
+	bool foldAtElse;
+	OptionsD() {
+		fold = false;
+		foldSyntaxBased = true;
+		foldComment = false;
+		foldCommentMultiline = true;
+		foldCommentExplicit = true;
+		foldExplicitStart = "";
+		foldExplicitEnd   = "";
+		foldExplicitAnywhere = false;
+		foldCompact = true;
+		foldAtElseInt = -1;
+		foldAtElse = false;
+	}
+};
+
+static const char * const dWordLists[] = {
+			"Primary keywords and identifiers",
+			"Secondary keywords and identifiers",
+			"Documentation comment keywords",
+			"Type definitions and aliases",
+			"Keywords 5",
+			"Keywords 6",
+			"Keywords 7",
+			0,
+		};
+
+struct OptionSetD : public OptionSet<OptionsD> {
+	OptionSetD() {
+		DefineProperty("fold", &OptionsD::fold);
+
+		DefineProperty("fold.d.syntax.based", &OptionsD::foldSyntaxBased,
+			"Set this property to 0 to disable syntax based folding.");
+
+		DefineProperty("fold.comment", &OptionsD::foldComment);
+
+		DefineProperty("fold.d.comment.multiline", &OptionsD::foldCommentMultiline,
+			"Set this property to 0 to disable folding multi-line comments when fold.comment=1.");
+
+		DefineProperty("fold.d.comment.explicit", &OptionsD::foldCommentExplicit,
+			"Set this property to 0 to disable folding explicit fold points when fold.comment=1.");
+
+		DefineProperty("fold.d.explicit.start", &OptionsD::foldExplicitStart,
+			"The string to use for explicit fold start points, replacing the standard //{.");
+
+		DefineProperty("fold.d.explicit.end", &OptionsD::foldExplicitEnd,
+			"The string to use for explicit fold end points, replacing the standard //}.");
+
+		DefineProperty("fold.d.explicit.anywhere", &OptionsD::foldExplicitAnywhere,
+			"Set this property to 1 to enable explicit fold points anywhere, not just in line comments.");
+
+		DefineProperty("fold.compact", &OptionsD::foldCompact);
+
+		DefineProperty("lexer.d.fold.at.else", &OptionsD::foldAtElseInt,
+			"This option enables D folding on a \"} else {\" line of an if statement.");
+
+		DefineProperty("fold.at.else", &OptionsD::foldAtElse);
+
+		DefineWordListSets(dWordLists);
+	}
+};
+
+class LexerD : public DefaultLexer {
+	bool caseSensitive;
+	WordList keywords;
+	WordList keywords2;
+	WordList keywords3;
+	WordList keywords4;
+	WordList keywords5;
+	WordList keywords6;
+	WordList keywords7;
+	OptionsD options;
+	OptionSetD osD;
+public:
+	LexerD(bool caseSensitive_) :
+		caseSensitive(caseSensitive_) {
+	}
+	virtual ~LexerD() {
+	}
+	void SCI_METHOD Release() override {
+		delete this;
+	}
+	int SCI_METHOD Version() const override {
+		return lvRelease4;
+	}
+	const char * SCI_METHOD PropertyNames() override {
+		return osD.PropertyNames();
+	}
+	int SCI_METHOD PropertyType(const char *name) override {
+		return osD.PropertyType(name);
+	}
+	const char * SCI_METHOD DescribeProperty(const char *name) override {
+		return osD.DescribeProperty(name);
+	}
+	Sci_Position SCI_METHOD PropertySet(const char *key, const char *val) override;
+	const char * SCI_METHOD DescribeWordListSets() override {
+		return osD.DescribeWordListSets();
+	}
+	Sci_Position SCI_METHOD WordListSet(int n, const char *wl) override;
+	void SCI_METHOD Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument *pAccess) override;
+	void SCI_METHOD Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument *pAccess) override;
+
+	void * SCI_METHOD PrivateCall(int, void *) override {
+		return 0;
+	}
+
+	static ILexer4 *LexerFactoryD() {
+		return new LexerD(true);
+	}
+	static ILexer4 *LexerFactoryDInsensitive() {
+		return new LexerD(false);
+	}
+};
+
+Sci_Position SCI_METHOD LexerD::PropertySet(const char *key, const char *val) {
+	if (osD.PropertySet(&options, key, val)) {
+		return 0;
+	}
+	return -1;
+}
+
+Sci_Position SCI_METHOD LexerD::WordListSet(int n, const char *wl) {
+	WordList *wordListN = 0;
+	switch (n) {
+	case 0:
+		wordListN = &keywords;
+		break;
+	case 1:
+		wordListN = &keywords2;
+		break;
+	case 2:
+		wordListN = &keywords3;
+		break;
+	case 3:
+		wordListN = &keywords4;
+		break;
+	case 4:
+		wordListN = &keywords5;
+		break;
+	case 5:
+		wordListN = &keywords6;
+		break;
+	case 6:
+		wordListN = &keywords7;
+		break;
+	}
+	Sci_Position firstModification = -1;
+	if (wordListN) {
+		WordList wlNew;
+		wlNew.Set(wl);
+		if (*wordListN != wlNew) {
+			wordListN->Set(wl);
+			firstModification = 0;
+		}
+	}
+	return firstModification;
+}
+
+void SCI_METHOD LexerD::Lex(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument *pAccess) {
+	LexAccessor styler(pAccess);
 
 	int styleBeforeDCKeyword = SCE_D_DEFAULT;
 
 	StyleContext sc(startPos, length, initStyle, styler);
 
-	int curLine = styler.GetLine(startPos);
+	Sci_Position curLine = styler.GetLine(startPos);
 	int curNcLevel = curLine > 0? styler.GetLineState(curLine-1): 0;
 	bool numFloat = false; // Float literals have '+' and '-' signs
 	bool numHex = false;
@@ -94,7 +266,7 @@ static void ColouriseDoc(unsigned int startPos, int length, int initStyle,
 				break;
 			case SCE_D_NUMBER:
 				// We accept almost anything because of hex. and number suffixes
-				if (isascii(sc.ch) && (isalnum(sc.ch) || sc.ch == '_')) {
+				if (IsASCII(sc.ch) && (isalnum(sc.ch) || sc.ch == '_')) {
 					continue;
 				} else if (sc.ch == '.' && sc.chNext != '.' && !numFloat) {
 					// Don't parse 0..2 as number.
@@ -294,27 +466,20 @@ static void ColouriseDoc(unsigned int startPos, int length, int initStyle,
 	sc.Complete();
 }
 
-static bool IsStreamCommentStyle(int style) {
-	return style == SCE_D_COMMENT ||
-		style == SCE_D_COMMENTDOC ||
-		style == SCE_D_COMMENTDOCKEYWORD ||
-		style == SCE_D_COMMENTDOCKEYWORDERROR;
-}
-
 // Store both the current line's fold level and the next lines in the
 // level store to make it easy to pick up with each increment
 // and to make it possible to fiddle the current level for "} else {".
-static void FoldDoc(unsigned int startPos, int length, int initStyle, Accessor &styler) {
-	bool foldComment = styler.GetPropertyInt("fold.comment") != 0;
-	bool foldCompact = styler.GetPropertyInt("fold.compact", 1) != 0;
 
-	// property lexer.d.fold.at.else
-	//  This option enables D folding on a "} else {" line of an if statement.
-	bool foldAtElse = styler.GetPropertyInt("lexer.d.fold.at.else",
-		styler.GetPropertyInt("fold.at.else", 0)) != 0;
-	unsigned int endPos = startPos + length;
+void SCI_METHOD LexerD::Fold(Sci_PositionU startPos, Sci_Position length, int initStyle, IDocument *pAccess) {
+
+	if (!options.fold)
+		return;
+
+	LexAccessor styler(pAccess);
+
+	Sci_PositionU endPos = startPos + length;
 	int visibleChars = 0;
-	int lineCurrent = styler.GetLine(startPos);
+	Sci_Position lineCurrent = styler.GetLine(startPos);
 	int levelCurrent = SC_FOLDLEVELBASE;
 	if (lineCurrent > 0)
 		levelCurrent = styler.LevelAt(lineCurrent-1) >> 16;
@@ -323,14 +488,16 @@ static void FoldDoc(unsigned int startPos, int length, int initStyle, Accessor &
 	char chNext = styler[startPos];
 	int styleNext = styler.StyleAt(startPos);
 	int style = initStyle;
-	for (unsigned int i = startPos; i < endPos; i++) {
+	bool foldAtElse = options.foldAtElseInt >= 0 ? options.foldAtElseInt != 0 : options.foldAtElse;
+	const bool userDefinedFoldMarkers = !options.foldExplicitStart.empty() && !options.foldExplicitEnd.empty();
+	for (Sci_PositionU i = startPos; i < endPos; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 		int stylePrev = style;
 		style = styleNext;
 		styleNext = styler.StyleAt(i + 1);
 		bool atEOL = (ch == '\r' && chNext != '\n') || (ch == '\n');
-		if (foldComment && IsStreamCommentStyle(style)) {
+		if (options.foldComment && options.foldCommentMultiline && IsStreamCommentStyle(style)) {
 			if (!IsStreamCommentStyle(stylePrev)) {
 				levelNext++;
 			} else if (!IsStreamCommentStyle(styleNext) && !atEOL) {
@@ -338,7 +505,25 @@ static void FoldDoc(unsigned int startPos, int length, int initStyle, Accessor &
 				levelNext--;
 			}
 		}
-		if (style == SCE_D_OPERATOR) {
+		if (options.foldComment && options.foldCommentExplicit && ((style == SCE_D_COMMENTLINE) || options.foldExplicitAnywhere)) {
+			if (userDefinedFoldMarkers) {
+				if (styler.Match(i, options.foldExplicitStart.c_str())) {
+ 					levelNext++;
+				} else if (styler.Match(i, options.foldExplicitEnd.c_str())) {
+ 					levelNext--;
+ 				}
+			} else {
+				if ((ch == '/') && (chNext == '/')) {
+					char chNext2 = styler.SafeGetCharAt(i + 2);
+					if (chNext2 == '{') {
+						levelNext++;
+					} else if (chNext2 == '}') {
+						levelNext--;
+					}
+				}
+ 			}
+ 		}
+		if (options.foldSyntaxBased && (style == SCE_D_OPERATOR)) {
 			if (ch == '{') {
 				// Measure the minimum before a '{' to allow
 				// folding on "} else {"
@@ -350,19 +535,19 @@ static void FoldDoc(unsigned int startPos, int length, int initStyle, Accessor &
 				levelNext--;
 			}
 		}
-		if (atEOL) {
-			if (foldComment) {  // Handle nested comments
+		if (atEOL || (i == endPos-1)) {
+			if (options.foldComment && options.foldCommentMultiline) {  // Handle nested comments
 				int nc;
 				nc =  styler.GetLineState(lineCurrent);
 				nc -= lineCurrent>0? styler.GetLineState(lineCurrent-1): 0;
 				levelNext += nc;
 			}
 			int levelUse = levelCurrent;
-			if (foldAtElse) {
+			if (options.foldSyntaxBased && foldAtElse) {
 				levelUse = levelMinCurrent;
 			}
 			int lev = levelUse | levelNext << 16;
-			if (visibleChars == 0 && foldCompact)
+			if (visibleChars == 0 && options.foldCompact)
 				lev |= SC_FOLDLEVELWHITEFLAG;
 			if (levelUse < levelNext)
 				lev |= SC_FOLDLEVELHEADERFLAG;
@@ -379,25 +564,4 @@ static void FoldDoc(unsigned int startPos, int length, int initStyle, Accessor &
 	}
 }
 
-static void FoldDDoc(unsigned int startPos, int length, int initStyle,
-	WordList *[], Accessor &styler) {
-		FoldDoc(startPos, length, initStyle, styler);
-}
-
-static const char * const dWordLists[] = {
-			"Primary keywords and identifiers",
-			"Secondary keywords and identifiers",
-			"Documentation comment keywords",
-			"Type definitions and aliases",
-			"Keywords 5",
-			"Keywords 6",
-			"Keywords 7",
-			0,
-		};
-
-static void ColouriseDDoc(unsigned int startPos, int length,
-	int initStyle, WordList *keywordlists[], Accessor &styler) {
-		ColouriseDoc(startPos, length, initStyle, keywordlists, styler, true);
-}
-
-LexerModule lmD(SCLEX_D, ColouriseDDoc, "d", FoldDDoc, dWordLists);
+LexerModule lmD(SCLEX_D, LexerD::LexerFactoryD, "d", dWordLists);

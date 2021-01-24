@@ -2,7 +2,7 @@
 /** @file LexConf.cxx
  ** Lexer for Apache Configuration Files.
  **
- ** First working version contributed by Ahmad Zawawi <zeus_go64@hotmail.com> on October 28, 2000.
+ ** First working version contributed by Ahmad Zawawi <ahmad.zawawi@gmail.com> on October 28, 2000.
  ** i created this lexer because i needed something pretty when dealing
  ** when Apache Configuration files...
  **/
@@ -20,7 +20,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -28,18 +27,16 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
-static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *keywordLists[], Accessor &styler)
+static void ColouriseConfDoc(Sci_PositionU startPos, Sci_Position length, int, WordList *keywordLists[], Accessor &styler)
 {
 	int state = SCE_CONF_DEFAULT;
 	char chNext = styler[startPos];
-	int lengthDoc = startPos + length;
+	Sci_Position lengthDoc = startPos + length;
 	// create a buffer large enough to take the largest chunk...
-	char *buffer = new char[length];
-	int bufferCount = 0;
+	char *buffer = new char[length+1];
+	Sci_Position bufferCount = 0;
 
 	// this assumes that we have 2 keyword list in conf.properties
 	WordList &directives = *keywordLists[0];
@@ -49,7 +46,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *k
 	// using the hand-written state machine shown below
 	styler.StartAt(startPos);
 	styler.StartSegment(startPos);
-	for (int i = startPos; i < lengthDoc; i++) {
+	for (Sci_Position i = startPos; i < lengthDoc; i++) {
 		char ch = chNext;
 		chNext = styler.SafeGetCharAt(i + 1);
 
@@ -75,17 +72,17 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *k
 				} else if( ch == '"') {
 					state = SCE_CONF_STRING;
 					styler.ColourTo(i,SCE_CONF_STRING);
-				} else if( isascii(ch) && ispunct(ch) ) {
+				} else if( IsASCII(ch) && ispunct(ch) ) {
 					// signals an operator...
 					// no state jump necessary for this
 					// simple case...
 					styler.ColourTo(i,SCE_CONF_OPERATOR);
-				} else if( isascii(ch) && isalpha(ch) ) {
+				} else if( IsASCII(ch) && isalpha(ch) ) {
 					// signals the start of an identifier
 					bufferCount = 0;
 					buffer[bufferCount++] = static_cast<char>(tolower(ch));
 					state = SCE_CONF_IDENTIFIER;
-				} else if( isascii(ch) && isdigit(ch) ) {
+				} else if( IsASCII(ch) && isdigit(ch) ) {
 					// signals the start of a number
 					bufferCount = 0;
 					buffer[bufferCount++] = ch;
@@ -112,7 +109,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *k
 				// if we find a non-alphanumeric char,
 				// we simply go to default state
 				// else we're still dealing with an extension...
-				if( (isascii(ch) && isalnum(ch)) || (ch == '_') ||
+				if( (IsASCII(ch) && isalnum(ch)) || (ch == '_') ||
 					(ch == '-') || (ch == '$') ||
 					(ch == '/') || (ch == '.') || (ch == '*') )
 				{
@@ -134,7 +131,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *k
 
 			case SCE_CONF_IDENTIFIER:
 				// stay  in CONF_IDENTIFIER state until we find a non-alphanumeric
-				if( (isascii(ch) && isalnum(ch)) || (ch == '_') || (ch == '-') || (ch == '/') || (ch == '$') || (ch == '.') || (ch == '*')) {
+				if( (IsASCII(ch) && isalnum(ch)) || (ch == '_') || (ch == '-') || (ch == '/') || (ch == '$') || (ch == '.') || (ch == '*')) {
 					buffer[bufferCount++] = static_cast<char>(tolower(ch));
 				} else {
 					state = SCE_CONF_DEFAULT;
@@ -159,7 +156,7 @@ static void ColouriseConfDoc(unsigned int startPos, int length, int, WordList *k
 
 			case SCE_CONF_NUMBER:
 				// stay  in CONF_NUMBER state until we find a non-numeric
-				if( (isascii(ch) && isdigit(ch)) || ch == '.') {
+				if( (IsASCII(ch) && isdigit(ch)) || ch == '.') {
 					buffer[bufferCount++] = ch;
 				} else {
 					state = SCE_CONF_DEFAULT;

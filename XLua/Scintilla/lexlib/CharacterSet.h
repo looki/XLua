@@ -8,9 +8,7 @@
 #ifndef CHARACTERSET_H
 #define CHARACTERSET_H
 
-#ifdef SCI_NAMESPACE
 namespace Scintilla {
-#endif
 
 class CharacterSet {
 	int size;
@@ -40,18 +38,50 @@ public:
 		if (base & setDigits)
 			AddString("0123456789");
 	}
+	CharacterSet(const CharacterSet &other) {
+		size = other.size;
+		valueAfter = other.valueAfter;
+		bset = new bool[size];
+		for (int i=0; i < size; i++) {
+			bset[i] = other.bset[i];
+		}
+	}
+	CharacterSet &operator=(CharacterSet &&other) {
+		if (this != &other) {
+			delete []bset;
+			size = other.size;
+			valueAfter = other.valueAfter;
+			bset = other.bset;
+			other.size = 0;
+			other.bset = nullptr;
+		}
+		return *this;
+	}
 	~CharacterSet() {
 		delete []bset;
 		bset = 0;
 		size = 0;
+	}
+	CharacterSet &operator=(const CharacterSet &other) {
+		if (this != &other) {
+			bool *bsetNew = new bool[other.size];
+			for (int i=0; i < other.size; i++) {
+				bsetNew[i] = other.bset[i];
+			}
+			delete []bset;
+			size = other.size;
+			valueAfter = other.valueAfter;
+			bset = bsetNew;
+		}
+		return *this;
 	}
 	void Add(int val) {
 		assert(val >= 0);
 		assert(val < size);
 		bset[val] = true;
 	}
-	void AddString(const char *CharacterSet) {
-		for (const char *cp=CharacterSet; *cp; cp++) {
+	void AddString(const char *setToAdd) {
+		for (const char *cp=setToAdd; *cp; cp++) {
 			int val = static_cast<unsigned char>(*cp);
 			assert(val >= 0);
 			assert(val < size);
@@ -90,7 +120,15 @@ inline bool IsADigit(int ch, int base) {
 }
 
 inline bool IsASCII(int ch) {
-	return ch < 0x80;
+	return (ch >= 0) && (ch < 0x80);
+}
+
+inline bool IsLowerCase(int ch) {
+	return (ch >= 'a') && (ch <= 'z');
+}
+
+inline bool IsUpperCase(int ch) {
+	return (ch >= 'A') && (ch <= 'Z');
 }
 
 inline bool IsAlphaNumeric(int ch) {
@@ -109,17 +147,16 @@ inline bool isspacechar(int ch) {
 }
 
 inline bool iswordchar(int ch) {
-	return IsASCII(ch) && (IsAlphaNumeric(ch) || ch == '.' || ch == '_');
+	return IsAlphaNumeric(ch) || ch == '.' || ch == '_';
 }
 
 inline bool iswordstart(int ch) {
-	return IsASCII(ch) && (IsAlphaNumeric(ch) || ch == '_');
+	return IsAlphaNumeric(ch) || ch == '_';
 }
 
 inline bool isoperator(int ch) {
-	if (IsASCII(ch) && IsAlphaNumeric(ch))
+	if (IsAlphaNumeric(ch))
 		return false;
-	// '.' left out as it is used to make up numbers
 	if (ch == '%' || ch == '^' || ch == '&' || ch == '*' ||
 	        ch == '(' || ch == ')' || ch == '-' || ch == '+' ||
 	        ch == '=' || ch == '|' || ch == '{' || ch == '}' ||
@@ -132,18 +169,23 @@ inline bool isoperator(int ch) {
 
 // Simple case functions for ASCII.
 
-inline char MakeUpperCase(char ch) {
+inline int MakeUpperCase(int ch) {
 	if (ch < 'a' || ch > 'z')
 		return ch;
 	else
 		return static_cast<char>(ch - 'a' + 'A');
 }
 
+inline int MakeLowerCase(int ch) {
+	if (ch < 'A' || ch > 'Z')
+		return ch;
+	else
+		return ch - 'A' + 'a';
+}
+
 int CompareCaseInsensitive(const char *a, const char *b);
 int CompareNCaseInsensitive(const char *a, const char *b, size_t len);
 
-#ifdef SCI_NAMESPACE
 }
-#endif
 
 #endif

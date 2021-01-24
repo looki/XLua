@@ -8,24 +8,29 @@
 #ifndef PARTITIONING_H
 #define PARTITIONING_H
 
+namespace Scintilla {
+
 /// A split vector of integers with a method for adding a value to all elements
 /// in a range.
 /// Used by the Partitioning class.
 
 class SplitVectorWithRangeAdd : public SplitVector<int> {
 public:
-	SplitVectorWithRangeAdd(int growSize_) {
+	explicit SplitVectorWithRangeAdd(int growSize_) {
 		SetGrowSize(growSize_);
 		ReAllocate(growSize_);
 	}
+	// Deleted so SplitVectorWithRangeAdd objects can not be copied.
+	SplitVectorWithRangeAdd(const SplitVectorWithRangeAdd &) = delete;
+	void operator=(const SplitVectorWithRangeAdd &) = delete;
 	~SplitVectorWithRangeAdd() {
 	}
 	void RangeAddDelta(int start, int end, int delta) {
 		// end is 1 past end, so end-start is number of elements to change
 		int i = 0;
-		int rangeLength = end - start;
+		const int rangeLength = end - start;
 		int range1Length = rangeLength;
-		int part1Left = part1Length - start;
+		const int part1Left = part1Length - start;
 		if (range1Length > part1Left)
 			range1Length = part1Left;
 		while (i < range1Length) {
@@ -42,6 +47,10 @@ public:
 
 /// Divide an interval into multiple partitions.
 /// Useful for breaking a document down into sections such as lines.
+/// A 0 length interval has a single 0 length partition, numbered 0
+/// If interval not 0 length then each partition non-zero length
+/// When needed, positions after the interval are considered part of the last partition
+/// but the end of the last partition can be found with PositionFromPartition(last+1).
 
 class Partitioning {
 private:
@@ -49,7 +58,7 @@ private:
 	// there may be a step somewhere in the list.
 	int stepPartition;
 	int stepLength;
-	SplitVectorWithRangeAdd *body;
+	std::unique_ptr<SplitVectorWithRangeAdd> body;
 
 	// Move step forward
 	void ApplyStep(int partitionUpTo) {
@@ -72,7 +81,7 @@ private:
 	}
 
 	void Allocate(int growSize) {
-		body = new SplitVectorWithRangeAdd(growSize);
+		body.reset(new SplitVectorWithRangeAdd(growSize));
 		stepPartition = 0;
 		stepLength = 0;
 		body->Insert(0, 0);	// This value stays 0 for ever
@@ -80,13 +89,15 @@ private:
 	}
 
 public:
-	Partitioning(int growSize) {
+	explicit Partitioning(int growSize) {
 		Allocate(growSize);
 	}
 
+	// Deleted so Partitioning objects can not be copied.
+	Partitioning(const Partitioning &) = delete;
+	void operator=(const Partitioning &) = delete;
+
 	~Partitioning() {
-		delete body;
-		body = 0;
 	}
 
 	int Partitions() const {
@@ -153,6 +164,7 @@ public:
 		return pos;
 	}
 
+	/// Return value in range [0 .. Partitions() - 1] even for arguments outside interval
 	int PartitionFromPosition(int pos) const {
 		if (body->Length() <= 1)
 			return 0;
@@ -161,7 +173,7 @@ public:
 		int lower = 0;
 		int upper = body->Length()-1;
 		do {
-			int middle = (upper + lower + 1) / 2; 	// Round high
+			const int middle = (upper + lower + 1) / 2; 	// Round high
 			int posMiddle = body->ValueAt(middle);
 			if (middle > stepPartition)
 				posMiddle += stepLength;
@@ -175,10 +187,11 @@ public:
 	}
 
 	void DeleteAll() {
-		int growSize = body->GetGrowSize();
-		delete body;
-		Allocate(growSize);
+		Allocate(body->GetGrowSize());
 	}
 };
+
+
+}
 
 #endif

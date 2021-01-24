@@ -17,7 +17,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -25,9 +24,7 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 /*
 | lexTable classificationBlock charClasses |
@@ -266,7 +263,7 @@ static void handleLetter(StyleContext& sc, WordList* specialSelectorList)
     sc.ChangeState(state);
 }
 
-static void colorizeSmalltalkDoc(unsigned int startPos, int length, int initStyle, WordList *wordLists[], Accessor &styler)
+static void colorizeSmalltalkDoc(Sci_PositionU startPos, Sci_Position length, int initStyle, WordList *wordLists[], Accessor &styler)
 {
     StyleContext sc(startPos, length, initStyle, styler);
 

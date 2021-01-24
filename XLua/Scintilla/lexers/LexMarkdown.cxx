@@ -44,7 +44,6 @@
 #include "Scintilla.h"
 #include "SciLexer.h"
 
-#include "PropSetSimple.h"
 #include "WordList.h"
 #include "LexAccessor.h"
 #include "Accessor.h"
@@ -52,17 +51,15 @@
 #include "CharacterSet.h"
 #include "LexerModule.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 static inline bool IsNewline(const int ch) {
     return (ch == '\n' || ch == '\r');
 }
 
 // True if can follow ch down to the end with possibly trailing whitespace
-static bool FollowToLineEnd(const int ch, const int state, const unsigned int endPos, StyleContext &sc) {
-    unsigned int i = 0;
+static bool FollowToLineEnd(const int ch, const int state, const Sci_PositionU endPos, StyleContext &sc) {
+    Sci_PositionU i = 0;
     while (sc.GetRelative(++i) == ch)
         ;
     // Skip over whitespace
@@ -79,7 +76,7 @@ static bool FollowToLineEnd(const int ch, const int state, const unsigned int en
 
 // Set the state on text section from current to length characters,
 // then set the rest until the newline to default, except for any characters matching token
-static void SetStateAndZoom(const int state, const int length, const int token, StyleContext &sc) {
+static void SetStateAndZoom(const int state, const Sci_Position length, const int token, StyleContext &sc) {
     sc.SetState(state);
     sc.Forward(length);
     sc.SetState(SCE_MARKDOWN_DEFAULT);
@@ -101,11 +98,11 @@ static void SetStateAndZoom(const int state, const int length, const int token, 
 
 // Does the previous line have more than spaces and tabs?
 static bool HasPrevLineContent(StyleContext &sc) {
-    int i = 0;
+    Sci_Position i = 0;
     // Go back to the previous newline
-    while ((--i + sc.currentPos) && !IsNewline(sc.GetRelative(i)))
+    while ((--i + (Sci_Position)sc.currentPos) >= 0 && !IsNewline(sc.GetRelative(i)))
         ;
-    while (--i + sc.currentPos) {
+    while ((--i + (Sci_Position)sc.currentPos) >= 0) {
         if (IsNewline(sc.GetRelative(i)))
             break;
         if (!IsASpaceOrTab(sc.GetRelative(i)))
@@ -114,11 +111,16 @@ static bool HasPrevLineContent(StyleContext &sc) {
     return false;
 }
 
-static bool IsValidHrule(const unsigned int endPos, StyleContext &sc) {
-    int c, count = 1;
-    unsigned int i = 0;
-    while (++i) {
-        c = sc.GetRelative(i);
+static bool AtTermStart(StyleContext &sc) {
+    return sc.currentPos == 0 || sc.chPrev == 0 || isspacechar(sc.chPrev);
+}
+
+static bool IsValidHrule(const Sci_PositionU endPos, StyleContext &sc) {
+    int count = 1;
+    Sci_PositionU i = 0;
+    for (;;) {
+        ++i;
+        int c = sc.GetRelative(i);
         if (c == sc.ch)
             ++count;
         // hit a terminating character
@@ -137,12 +139,11 @@ static bool IsValidHrule(const unsigned int endPos, StyleContext &sc) {
             }
         }
     }
-    return false;
 }
 
-static void ColorizeMarkdownDoc(unsigned int startPos, int length, int initStyle,
+static void ColorizeMarkdownDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
                                WordList **, Accessor &styler) {
-    unsigned int endPos = startPos + length;
+    Sci_PositionU endPos = startPos + length;
     int precharCount = 0;
     // Don't advance on a new loop iteration and retry at the same position.
     // Useful in the corner case of having to start at the beginning file position
@@ -222,7 +223,7 @@ static void ColorizeMarkdownDoc(unsigned int startPos, int length, int initStyle
         }
         else if (sc.state == SCE_MARKDOWN_CODEBK) {
             if (sc.atLineStart && sc.Match("~~~")) {
-                int i = 1;
+                Sci_Position i = 1;
                 while (!IsNewline(sc.GetRelative(i)) && sc.currentPos + i < endPos)
                     i++;
                 sc.Forward(i);
@@ -344,8 +345,8 @@ static void ColorizeMarkdownDoc(unsigned int startPos, int length, int initStyle
             }
             // Links and Images
             if (sc.Match("![") || sc.ch == '[') {
-                int i = 0, j = 0, k = 0;
-                int len = endPos - sc.currentPos;
+                Sci_Position i = 0, j = 0, k = 0;
+                Sci_Position len = endPos - sc.currentPos;
                 while (i < len && (sc.GetRelative(++i) != ']' || sc.GetRelative(i - 1) == '\\'))
                     ;
                 if (sc.GetRelative(i) == ']') {
@@ -374,35 +375,38 @@ static void ColorizeMarkdownDoc(unsigned int startPos, int length, int initStyle
                 }
             }
             // Code - also a special case for alternate inside spacing
-            if (sc.Match("``") && sc.GetRelative(3) != ' ') {
+            if (sc.Match("``") && sc.GetRelative(3) != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_CODE2);
                 sc.Forward();
             }
-            else if (sc.ch == '`' && sc.chNext != ' ') {
+            else if (sc.ch == '`' && sc.chNext != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_CODE);
             }
             // Strong
-            else if (sc.Match("**") && sc.GetRelative(2) != ' ') {
+            else if (sc.Match("**") && sc.GetRelative(2) != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_STRONG1);
                 sc.Forward();
            }
-            else if (sc.Match("__") && sc.GetRelative(2) != ' ') {
+            else if (sc.Match("__") && sc.GetRelative(2) != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_STRONG2);
                 sc.Forward();
             }
             // Emphasis
-            else if (sc.ch == '*' && sc.chNext != ' ')
+            else if (sc.ch == '*' && sc.chNext != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_EM1);
-            else if (sc.ch == '_' && sc.chNext != ' ')
+            }
+            else if (sc.ch == '_' && sc.chNext != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_EM2);
+            }
             // Strikeout
-            else if (sc.Match("~~") && sc.GetRelative(2) != ' ') {
+            else if (sc.Match("~~") && sc.GetRelative(2) != ' ' && AtTermStart(sc)) {
                 sc.SetState(SCE_MARKDOWN_STRIKEOUT);
                 sc.Forward();
             }
             // Beginning of line
-            else if (IsNewline(sc.ch))
+            else if (IsNewline(sc.ch)) {
                 sc.SetState(SCE_MARKDOWN_LINE_BEGIN);
+            }
         }
         // Advance if not holding back the cursor for this iteration.
         if (!freezeCursor)

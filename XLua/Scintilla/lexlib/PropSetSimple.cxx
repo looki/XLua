@@ -7,23 +7,15 @@
 
 // Maintain a dictionary of properties
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#ifdef _MSC_VER
-// Visual C++ doesn't like unreachable code or long decorated names in its own headers.
-#pragma warning(disable: 4018 4100 4245 4511 4512 4663 4702 4786)
-#endif
+#include <cstdlib>
+#include <cstring>
 
 #include <string>
 #include <map>
 
 #include "PropSetSimple.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 typedef std::map<std::string, std::string> mapss;
 
@@ -61,9 +53,10 @@ void PropSetSimple::Set(const char *keyVal) {
 		endVal++;
 	const char *eqAt = strchr(keyVal, '=');
 	if (eqAt) {
-		Set(keyVal, eqAt + 1, eqAt-keyVal, endVal - eqAt - 1);
+		Set(keyVal, eqAt + 1, static_cast<int>(eqAt-keyVal),
+			static_cast<int>(endVal - eqAt - 1));
 	} else if (*keyVal) {	// No '=' so assume '=1'
-		Set(keyVal, "1", endVal-keyVal, 1);
+		Set(keyVal, "1", static_cast<int>(endVal-keyVal), 1);
 	}
 }
 
@@ -140,30 +133,21 @@ static int ExpandAllInPlace(const PropSetSimple &props, std::string &withVars, i
 	return maxExpands;
 }
 
-char *PropSetSimple::Expanded(const char *key) const {
+int PropSetSimple::GetExpanded(const char *key, char *result) const {
 	std::string val = Get(key);
 	ExpandAllInPlace(*this, val, 100, VarChain(key));
-	char *ret = new char [val.size() + 1];
-	strcpy(ret, val.c_str());
-	return ret;
-}
-
-int PropSetSimple::GetExpanded(const char *key, char *result) const {
-	char *val = Expanded(key);
-	const int n = strlen(val);
+	const int n = static_cast<int>(val.size());
 	if (result) {
-		strcpy(result, val);
+		memcpy(result, val.c_str(), n+1);
 	}
-	delete []val;
 	return n;	// Not including NUL
 }
 
 int PropSetSimple::GetInt(const char *key, int defaultValue) const {
-	char *val = Expanded(key);
-	if (val) {
-		int retVal = val[0] ? atoi(val) : defaultValue;
-		delete []val;
-		return retVal;
+	std::string val = Get(key);
+	ExpandAllInPlace(*this, val, 100, VarChain(key));
+	if (!val.empty()) {
+		return atoi(val.c_str());
 	}
 	return defaultValue;
 }
