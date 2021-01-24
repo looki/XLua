@@ -60,8 +60,9 @@ public:
 	}
 	TempMMFString(LPRDATA rdPtr, const std::string& source) : mmfAllocated(true) {
 		int length = MultiByteToWideChar(CP_UTF8, 0, source.c_str(), source.size(), NULL, 0);
-		str = (wchar_t*)callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, source.size() + 1);
+		str = (wchar_t*)callRunTimeFunction(rdPtr, RFUNCTION_GETSTRINGSPACE_EX, 0, (length + 1) * sizeof(wchar_t));
 		MultiByteToWideChar(CP_UTF8, 0, source.c_str(), source.size(), str, length);
+		str[length] = L'\0'; // MBTOWC won't include it if we don't pass -1 as length!
 	}
 
 	~TempMMFString() {
