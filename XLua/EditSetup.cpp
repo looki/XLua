@@ -558,15 +558,32 @@ void CaptureName (HWND hwnd) {
 
 	int len = SendDlgItemMessageA(hwnd, IDC_EDIT_NEWNAME, EM_LINELENGTH, 0, 0);
 	
-	// Setup destination buffer to accept a string from the input box.
-	char* buf = new char[len + 1];
-	((int*)buf)[0] = len + 1;
+	if (len >= 1) {
+		// Setup destination buffer to accept a string from the input box.
+		len = max(4, len + 1);
+		char* buf = new char[len];
+		((int*)buf)[0] = len;
 
-	// Grab name and store it to a temporary place in the ScriptManager
-	SendDlgItemMessageA(hwnd, IDC_EDIT_NEWNAME, EM_GETLINE, 0, (LPARAM)buf);
-	sm.tempName = buf;
+		// Grab name and store it to a temporary place in the ScriptManager
+		SendDlgItemMessageA(hwnd, IDC_EDIT_NEWNAME, EM_GETLINE, 0, (LPARAM)buf);
+		sm.tempName = buf;
 
-	delete[] buf;
+		delete[] buf;
+	}
+	else {
+		ScriptSet * ss = sm.edPtr->tData->scripts;
+		char name[20] = "Script 1";
+		int id = 1;
+	retry:
+		for (const auto& script : ss->scripts) {
+			if (script->name == name) {
+				id++;
+				sprintf_s(name, "Script %d", id);
+				goto retry;
+			}
+		}
+		sm.tempName = name;
+	}
 }
 
 /**
@@ -976,7 +993,9 @@ INT_PTR CALLBACK SetupDialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 		return TRUE;
 
 	case WM_CLOSE:
+		EditDiscard(hwndDlg);
 		sm.EndDlg(hwndDlg);
+		EndDialog(hwndDlg, IDCANCEL);
 		return FALSE;
 
 	case WM_SIZE:
