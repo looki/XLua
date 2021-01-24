@@ -110,7 +110,7 @@ BEGIN
     BEGIN
         MENUITEM "On Error",                    IDMN_CND_ON_ERROR
         MENUITEM "On Print",                    IDMN_CND_ON_PRINT
-        MENUITEM "On Fucntion",                 IDMN_CND_ON_FUNCTION
+        MENUITEM "On Function",                 IDMN_CND_ON_FUNCTION
         POPUP "Function Groups"
         BEGIN
             MENUITEM "On Function.A",               IDMN_CND_ON_FUNCTION_A
