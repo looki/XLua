@@ -514,7 +514,7 @@ void WINAPI DLLExport GetDebugItem(LPTSTR pBuffer, LPRDATA rdPtr, int id)
 {
 #if !defined(RUN_ONLY)
 
-	TCHAR temp[DB_BUFFERSIZE];
+	TCHAR temp[DB_BUFFERSIZE] = {};
 
 	switch (id)
 	{
@@ -531,7 +531,8 @@ void WINAPI DLLExport GetDebugItem(LPTSTR pBuffer, LPRDATA rdPtr, int id)
 
 	case DB_LASTERROR:
 	{
-		TempMMFString str = rdPtr->luaMan->lastErrorString.substr(0, DB_BUFFERSIZE - _tcslen(temp)).c_str();
+		std::string error = rdPtr->luaMan->lastErrorString.substr(0, DB_BUFFERSIZE - _tcslen(temp));
+		TempMMFString str = error.c_str();
 		LoadString(hInstLib, IDS_DB_LASTERROR, temp, DB_BUFFERSIZE);
 		wsprintf(pBuffer, temp, str.c_str());
 		break;
@@ -539,7 +540,8 @@ void WINAPI DLLExport GetDebugItem(LPTSTR pBuffer, LPRDATA rdPtr, int id)
 
 	case DB_LASTPRINT:
 	{
-		TempMMFString str = rdPtr->luaMan->lastPrintString.substr(0, DB_BUFFERSIZE - _tcslen(temp)).c_str();
+		std::string print = rdPtr->luaMan->lastPrintString.substr(0, DB_BUFFERSIZE - _tcslen(temp));
+		TempMMFString str = print.c_str();
 		LoadString(hInstLib, IDS_DB_LASTPRINT, temp, DB_BUFFERSIZE);
 		wsprintf(pBuffer, temp, str.c_str());
 		break;
