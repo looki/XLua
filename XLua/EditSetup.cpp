@@ -334,6 +334,10 @@ void InitEditor (HWND hwnd) {
 
 	// Strings
 	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_STRING, RGB(192, 0, 0));
+	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_STRINGEOL, RGB(192, 0, 0));
+	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_CHARACTER, RGB(192, 0, 0));
+	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_LITERALSTRING, RGB(192, 0, 0));
+	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_PREPROCESSOR, RGB(192, 0, 0));
 
 	// Ops
 	SendMessage(hwnd, SCI_STYLESETFORE, SCE_LUA_OPERATOR, RGB(0, 128, 128));
