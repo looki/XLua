@@ -93,6 +93,9 @@ extern "C" __declspec(dllexport) int luaopen_mmfi(lua_State * L) {
 	PushStandardClosure(L, Object::NewObject);
 	lua_setfield(L, -2, "newObject");
 
+	PushStandardClosure(L, Object::CreateObject);
+	lua_setfield(L, -2, "createObject");
+
 	PushStandardClosure(L, ObjectClass::NewObjectClass);
 	lua_setfield(L, -2, "newObjectClass");
 

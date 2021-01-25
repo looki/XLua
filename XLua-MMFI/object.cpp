@@ -238,3 +238,63 @@ int Object::NewObject (lua_State* L) {
 
 	return 1;
 }
+
+int Object::CreateObject (lua_State* L)
+{
+	LPRH rhPtr = xlua_get_run_header(L);
+
+	int base = lua_gettop(L);								// +0
+	if (base <= 0)
+		return 0;
+
+	lua_checkstack(L, base + 10);
+
+	LPOIL creationOI = ObjectClass::GetObjectClass(L, lua_tostring(L, 1));
+
+	if (!creationOI)
+		return 0;
+
+	int x = luaL_optinteger(L, 2, 0);
+	int y = luaL_optinteger(L, 3, 0);
+	int layer = luaL_optinteger(L, 4, 1) - 1;
+
+	//Create the event buffer (with plenty space):
+	char buffer[sizeof(event) + sizeof(eventParam) + sizeof(CreateDuplicateParam)] = {};
+
+	//Put the layer number in to a proper range
+	if (layer >= rhPtr->rhFrame->m_nLayers)
+		layer = rhPtr->rhFrame->m_nLayers - 1;
+	if (layer < -1)
+		layer = -1;
+
+	//The event that should be passed to the CreateObject routine
+	event* evt = (event*)&buffer[0];
+	evt->evtCode = MAKELONG(0, 0);
+
+	//Resides at event+14
+	eventParam* creationParams = (eventParam*)((char*)&buffer[0] + ACT_SIZE);
+
+	//The object creation parameters
+	CreateDuplicateParam* cdp = (CreateDuplicateParam*)&creationParams->evp.evpW.evpW0;
+	cdp->cdpHFII = rhPtr->rhNumberOi;
+	cdp->cdpOi = creationOI->oilOi;
+	cdp->cdpPos.posX = x;
+	cdp->cdpPos.posY = y;
+	cdp->cdpPos.posLayer = layer;
+	cdp->cdpPos.posOINUMParent = -1;
+	cdp->cdpPos.posFlags = 8;
+
+	//Call the routine
+	CallTables* tables = (CallTables*)rhPtr->rh4.rh4KpxFunctions[RFUNCTION_GETCALLTABLES].routine(nullptr, 0, 0);
+	CALLACTION_ROUTINE createObject = tables->pActions[2];
+	createObject(evt);
+	mvFree(rhPtr->rh4.rh4Mv, tables);
+
+	LPHO createdHO = rhPtr->rhObjectList[creationOI->oilListSelected].oblOffset;
+	
+	// Call mmf.newObject with the new fixed value
+	unsigned int fixed = createdHO->hoCreationId << 16 | createdHO->hoNumber;
+	lua_settop(L, 0);
+	lua_pushinteger(L, fixed);
+	return Object::NewObject(L);
+}

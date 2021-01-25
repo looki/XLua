@@ -1,5 +1,8 @@
 #include "object.h"
 
+#define FORCE_UNICODE_HELPERS
+#include "../XLua/UnicodeHelpers.h"
+
 int Common::CommonIndex (lua_State* L) {
 	return StandardIndex(L, CommonRead, CommonWrite);
 }
@@ -25,7 +28,16 @@ int Common::ClassID (lua_State* L) {
 int Common::ClassName (lua_State* L) {
 	LPHO o = GetHO(lua_touserdata(L, lua_upvalueindex(UV_OBJECT_LPHO)));
 	LPRS r = (LPRS)o;
-	lua_pushstring(L, (LPSTR) &(o->hoOiList->oilName));
+
+	static bool rtUnicode = o->hoAdRunHeader->rh4.rh4Mv->mvCallFunction(NULL, EF_ISUNICODE, 0, 0, 0);
+
+	if (rtUnicode) {
+		TempLuaString name((wchar_t*)&o->hoOiList->oilName[0]);
+		lua_pushstring(L, name.c_str());
+	}
+	else {
+		lua_pushstring(L, (LPSTR) & (o->hoOiList->oilName));
+	}
 	return 1;
 }
 

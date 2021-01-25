@@ -9,6 +9,7 @@ public:
 
 	static int		NewObjectClass (lua_State* L);
 	static LPOIL	GetObjectClass (lua_State* L, int index);
+	static LPOIL	GetObjectClass (lua_State* L, const char* name);
 
 	// Extension Type
 	static int	TypeID (lua_State* L);

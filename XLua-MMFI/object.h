@@ -10,6 +10,7 @@ class Object {
 public:
 
 	static int	NewObject (lua_State* L);
+	static int	CreateObject (lua_State* L);
 	static LPHO	GetObject (lua_State* L, int index);
 
 	static int	IndexMetamethod (lua_State* L);

@@ -56,7 +56,8 @@ LPOIL ObjectClass::GetObjectClass (lua_State* L, int index) {
 	return oi;
 }
 
-int ObjectClass::NewObjectClass (lua_State* L) {
+LPOIL ObjectClass::GetObjectClass(lua_State* L, const char* name)
+{
 	LPRH rhPtr = xlua_get_run_header(L);
 	if (!rhPtr)
 		return 0;
@@ -66,45 +67,40 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 
 	size_t oiListItemSize = sizeof(objInfoList);
 
-
-#ifdef UNICODE //ACT_EXTSTOPTORQUE <- this should work according to Yves, guess it assumes Unicode?
+	#ifdef UNICODE //ACT_EXTSTOPTORQUE <- this should work according to Yves, guess it assumes Unicode?
 	// Fusion 2.5 SDK
 
 	if (!rtUnicode)
 		oiListItemSize -= 24;
-#ifndef HWABETA
+	#ifndef HWABETA
 	if (!rtHWA)
 		oiListItemSize -= sizeof(LPVOID);
-#endif
+	#endif
 
-#else
+	#else
 	// Fusion 2.0 SDK
 
 	if (rtUnicode)
 		oiListItemSize += 24;
-#ifndef HWABETA
+	#ifndef HWABETA
 	if (rtHWA)
 		oiListItemSize += sizeof(LPVOID);
-#endif
+	#endif
 
-#endif
+	#endif
 
 	LPOIL oiList = rhPtr->rhOiList;
-	LPOIL oi = 0;
-
-	const char* name = lua_tostring(L, 1);
 
 	if (rtUnicode) {
 		const size_t size = strlen(name) + 1;
 		wchar_t wide_name[25] = {};
-		mbstowcs(wide_name, name, size);
+		MultiByteToWideChar(CP_UTF8, 0, name, -1, wide_name, 25);
 
 		for (int i = 0; i < rhPtr->rhNumberOi; i++) {
 			LPOIL currentOi = (LPOIL)(((char*)oiList) + oiListItemSize * i);
 
-			if (!wcscmp((wchar_t *)currentOi->oilName, wide_name)) {
-				oi = currentOi;
-				break;
+			if (!wcscmp((wchar_t*)currentOi->oilName, wide_name)) {
+				return currentOi;
 			}
 		}
 	}
@@ -113,11 +109,21 @@ int ObjectClass::NewObjectClass (lua_State* L) {
 			LPOIL currentOi = (LPOIL)(((char*)oiList) + oiListItemSize * i);
 
 			if (!strcmp(currentOi->oilName, name)) {
-				oi = currentOi;
-				break;
+				return currentOi;
 			}
 		}
 	}
+
+	return nullptr;
+}
+
+int ObjectClass::NewObjectClass (lua_State* L) {
+
+	LPRH rhPtr = xlua_get_run_header(L);
+	if (!rhPtr)
+		return 0;
+	
+	LPOIL oi = GetObjectClass(L, lua_tostring(L, 1));
 
 	if (!oi)
 		return 0;
