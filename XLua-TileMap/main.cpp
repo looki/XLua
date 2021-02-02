@@ -4,6 +4,7 @@
 #include "sol.hpp"
 #include "xlua.h"
 
+#include <shlwapi.h>
 #include "Common.h"
 #include "Rundata.h"
 
@@ -15,10 +16,10 @@ static lua_State * L = nullptr;
 namespace sol {
 	inline void assert_throw(bool assertion, const char * message) {
 		if (!assertion) {
-			luaL_traceback(L, L, message, 0);
-			const char * error_string = lua_tostring(L, -1);
-			lua_pop(L, 1);
-			throw sol::error(error_string);
+			//luaL_traceback(L, L, message, 0);
+			//const char * error_string = lua_tostring(L, -1);
+			//lua_pop(L, 1);
+			throw sol::error(message);
 		}
 	}
 }

@@ -14,7 +14,7 @@
     <ProjectName>dll_tilemap</ProjectName>
     <ProjectGuid>{E6559166-1CD7-45EB-BCC2-3A5595DBEE2A}</ProjectGuid>
     <RootNamespace>ext_dyngrid</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -25,7 +25,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v140_xp</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -52,7 +52,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;c:\Dev\mmf\XLua\XLua\Lua\;D:\Dev\c++\mmf2\rSDK\Extensions\TileMap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;..\XLua\LuaJIT-2.0.5\src;d:\Dev\Fusion\SDKs\rSDK\Extensions\TileMap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -62,7 +62,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>..\rSDK\Lib\mmfs2.lib;..\XLua\Debug\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>d:\Dev\mmf\tilemap.dll</OutputFile>
+      <OutputFile>$(OutDir)tilemap.dll</OutputFile>
       <AdditionalLibraryDirectories>..\XLua\Release;..\..\vendor\SDK\current\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
@@ -72,7 +72,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;c:\Dev\mmf\XLua\XLua\Lua\;D:\Dev\c++\mmf2\rSDK\Extensions\TileMap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\Lua\current;..\rSDK\Inc;..\xSDK\Inc;..\XLua\LuaJIT-2.0.5\src;d:\Dev\Fusion\SDKs\rSDK\Extensions\TileMap;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WarningLevel>Level3</WarningLevel>
@@ -80,8 +80,8 @@
       <PreprocessorDefinitions>_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\rSDK\Lib\mmfs2.lib;..\XLua\Debug\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>d:\Dev\mmf\tilemap.dll</OutputFile>
+      <AdditionalDependencies>..\rSDK\Lib\mmfs2.lib;..\XLua\Release\xlua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)tilemap.dll</OutputFile>
       <AdditionalLibraryDirectories>..\XLua\Release;..\rSDK\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OptimizeReferences>true</OptimizeReferences>
