@@ -301,7 +301,7 @@ long WINAPI DLLExport ExpIntFuncNP(LPRDATA rdPtr, long param1) {
 // int ExpIntFuncSP (TCHAR* func)
 long WINAPI DLLExport ExpIntFuncSP(LPRDATA rdPtr, long param1) {
 	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
-	TCHAR* p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
+	TempLuaString p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	if (rdPtr->luaMan->state == NULL) {
 		return 0;
@@ -342,7 +342,7 @@ long WINAPI DLLExport ExpStrFuncNP(LPRDATA rdPtr, long param1) {
 // TCHAR* ExpStrFuncSP (TCHAR* func)
 long WINAPI DLLExport ExpStrFuncSP(LPRDATA rdPtr, long param1) {
 	TempLuaString p1 = (TCHAR*)CNC_GetFirstExpressionParameter(rdPtr, param1, TYPE_STRING);
-	TCHAR* p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
+	TempLuaString p2 = (TCHAR*)CNC_GetNextExpressionParameter(rdPtr, param1, TYPE_STRING);
 
 	rdPtr->rHo.hoFlags |= HOF_STRING;
 
